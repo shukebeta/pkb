@@ -14,6 +14,12 @@ docs/
 
 ## Quick Index
 
+### Guides
+- [Docker Auto Installation](docs/guides/docker-auto-install.md) - Non-interactive Docker setup for Ubuntu
+- [Docker Data Restore](docs/guides/docker-data-restore.md) - Restore Docker containers/images from backup
+- [Cloudflare DNS Update](docs/guides/cloudflare-dns-update.md) - Update DNS records with Tailscale IP via API
+- [GitHub PR Diff Trick](docs/guides/github-pr-diff-trick.md) - View PR diffs in different formats
+
 ### Troubleshooting
 - [Disable Rider WinForms Designer](docs/troubleshooting/disable-rider-winforms-designer.md) - Fix build-blocking designer processes
 

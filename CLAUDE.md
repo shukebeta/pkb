@@ -16,6 +16,7 @@ When creating documentation/guides:
 - Include practical examples with code blocks
 - Keep it brief but complete
 - Focus on "how-to" rather than "why"
+- **ALWAYS update README.md index after creating new guides/articles**
 
 ## File Organization
 

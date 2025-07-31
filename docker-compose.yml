@@ -8,7 +8,7 @@ services:
       - "5341:80"
     environment:
       - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=# Leave empty for development
+      - SEQ_PASSWORD=dev123
     volumes:
       - seq-data:/data
     restart: unless-stopped

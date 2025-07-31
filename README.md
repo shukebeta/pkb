@@ -15,12 +15,11 @@ docs/
 ## Quick Index
 
 ### Guides
+- [CLI Development with Seq](docs/guides/cli-development-with-seq.md) - Command-line development and debugging with Seq logging
 - [Docker Auto Installation](docs/guides/docker-auto-install.md) - Non-interactive Docker setup for Ubuntu
 - [Docker Data Restore](docs/guides/docker-data-restore.md) - Restore Docker containers/images from backup
 - [Cloudflare DNS Update](docs/guides/cloudflare-dns-update.md) - Update DNS records with Tailscale IP via API
 - [GitHub PR Diff Trick](docs/guides/github-pr-diff-trick.md) - View PR diffs in different formats
-- [CLI C# Development](docs/guides/cli-csharp-development.md) - Command-line C# development with Seq logging
-- [Flutter Seq Integration](docs/guides/flutter-seq-integration.md) - Flutter logging to Seq server
 
 ### Troubleshooting
 - [Disable Rider WinForms Designer](docs/troubleshooting/disable-rider-winforms-designer.md) - Fix build-blocking designer processes

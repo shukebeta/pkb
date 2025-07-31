@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  seq:
+    image: datalust/seq:latest
+    container_name: seq-dev
+    ports:
+      - "5341:80"
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=# Leave empty for development
+    volumes:
+      - seq-data:/data
+    restart: unless-stopped
+    networks:
+      - dev-network
+
+volumes:
+  seq-data:
+    driver: local
+
+networks:
+  dev-network:
+    driver: bridge

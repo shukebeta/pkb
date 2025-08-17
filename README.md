@@ -20,6 +20,7 @@ docs/
 - [Docker Data Restore](docs/guides/docker-data-restore.md) - Restore Docker containers/images from backup
 - [Cloudflare DNS Update](docs/guides/cloudflare-dns-update.md) - Update DNS records with Tailscale IP via API
 - [GitHub PR Diff Trick](docs/guides/github-pr-diff-trick.md) - View PR diffs in different formats
+- [Node.js Path Mocking Dependency Injection](docs/guides/nodejs-path-mocking-dependency-injection.md) - Cross-platform testing with path.win32/posix
 
 ### Troubleshooting
 - [Disable Rider WinForms Designer](docs/troubleshooting/disable-rider-winforms-designer.md) - Fix build-blocking designer processes

@@ -30,3 +30,7 @@ When creating documentation/guides:
 - Code examples over descriptions  
 - One-sentence explanations maximum
 - No unnecessary pleasantries or confirmations
+
+## Git Workflow Practices
+
+- After updating the README.md file, proactively commit the changes you made and push them to remote

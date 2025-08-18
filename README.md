@@ -21,6 +21,7 @@ docs/
 - [Cloudflare DNS Update](docs/guides/cloudflare-dns-update.md) - Update DNS records with Tailscale IP via API
 - [GitHub PR Diff Trick](docs/guides/github-pr-diff-trick.md) - View PR diffs in different formats
 - [Node.js Path Mocking Dependency Injection](docs/guides/nodejs-path-mocking-dependency-injection.md) - Cross-platform testing with path.win32/posix
+- [Claude Memory Continuity Prompts](docs/guides/claude-memory-continuity-prompts.md) - Maintain conversation memory across Claude windows
 
 ### Troubleshooting
 - [Disable Rider WinForms Designer](docs/troubleshooting/disable-rider-winforms-designer.md) - Fix build-blocking designer processes

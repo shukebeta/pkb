@@ -1,0 +1,50 @@
+# Cheerful Go-Ahead Command
+
+Provide an encouraging message to motivate continued work and action.
+
+## Instructions:
+
+1. Randomly select one cheerful phrase from the collection below
+2. Display the selected phrase with appropriate formatting
+3. Optional: Add a brief context-appropriate follow-up if relevant to current task
+
+## Cheerful Phrases Collection:
+
+- "Let's do this!"
+- "Go for it!"
+- "Make it happen!"  
+- "Let's get it done!"
+- "Time to shine!"
+- "Rock and roll!"
+- "Full steam ahead!"
+- "Let's make some magic!"
+- "Showtime!"
+- "Let's roll!"
+- "Bring it on!"
+- "Ready, set, go!"
+- "Let's crush it!"
+- "Game time!"
+- "Let's build something awesome!"
+
+## Display Format:
+
+```
+🚀 [Selected Phrase]
+
+Ready to tackle the next challenge!
+```
+
+## Usage Context:
+
+Use this command when:
+- About to start a new coding task
+- Need motivation to continue working  
+- Want to inject some positive energy into the session
+- Ready to move forward with a plan or implementation
+
+## Important:
+
+- Keep it brief and energetic
+- Choose phrases that sound natural and encouraging
+- Maintain professional but enthusiastic tone
+- No need to explain what to do next - just provide the encouragement

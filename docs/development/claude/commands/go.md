@@ -13,18 +13,9 @@ Provide an encouraging message to motivate continued work and action.
 - "Let's do this!"
 - "Go for it!"
 - "Make it happen!"  
-- "Let's get it done!"
-- "Time to shine!"
-- "Rock and roll!"
-- "Full steam ahead!"
-- "Let's make some magic!"
-- "Showtime!"
-- "Let's roll!"
-- "Bring it on!"
+- "Please get it done!"
 - "Ready, set, go!"
-- "Let's crush it!"
-- "Game time!"
-- "Let's build something awesome!"
+- "Please crush it!"
 
 ## Display Format:
 

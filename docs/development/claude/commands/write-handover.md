@@ -1,6 +1,6 @@
 # Write Session Handover Document
 
-Create a comprehensive handover document for the current session.
+Create a short but comprehensive handover document for the current session.
 
 ## Instructions:
 
@@ -15,7 +15,9 @@ Create a comprehensive handover document for the current session.
 # Date: YYYY-MM-DD HH:MM
 # Context: [Brief session context/main topic]
 
-## COMPLETED TASKS
+## The issue you are working on
+
+## COMPLETED TASKS/ATTEMPTS
 
 ### [Category 1]
 1. **[Task Name] - [STATUS]**
@@ -27,14 +29,16 @@ Create a comprehensive handover document for the current session.
 - **[Task Name]**: [Brief description of what was completed]
 - **[Another Task]**: [Brief description]
 
+## TODO LIST with completed and incomplete Tasks
+
 ## TECHNICAL IMPLEMENTATION
 
 ### Key Files Modified
-- `path/to/file.dart`: [What was changed]
-- `path/to/another_file.dart`: [What was changed]
+- `path/to/file1`: [What was changed]
+- `path/to/another_file`: [What was changed]
 
 ### Critical Methods Added/Modified
-```dart
+```code
 // Brief code examples if relevant
 @override Future<SomeType> methodName()
 ```

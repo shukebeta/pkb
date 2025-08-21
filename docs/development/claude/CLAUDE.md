@@ -138,37 +138,83 @@ For running specific tests, **ALWAYS** use the correct pattern: `dotnet test [pr
 ### G/S Tools (~/bin/g and ~/bin/s)
 **CRITICAL: Prefer these tools over multiple Edit operations for batch changes**
 
+**What They Are:**
+- `g` and `s` are powerful wrappers/frontends for **ripgrep (rg)**
+- They provide the full power of ripgrep with enhanced usability
+- Use **ripgrep syntax** for all search patterns and regex operations
+
 **Features:**
-- Full regex support with capture groups ($1, $2, etc.)
+- Full ripgrep regex support with capture groups ($1, $2, etc.)
 - Two-step workflow: search first, then replace
+- **Delete functionality**: Use empty replacement string to delete matched patterns
 - Comprehensive file exclusions (node_modules, .git, binary files, etc.)
 - Built-in safety features (dry-run with precise diff preview, backup/restore on failure)
-- Supports complex regex patterns for advanced refactoring
+- Supports complex ripgrep regex patterns for advanced refactoring
 - User options override defaults (e.g., -i for case-insensitive can override default behavior)
 
 **Priority Usage:**
-- Use `g` for searching patterns across codebase
+- Use `g` for searching patterns across codebase (ripgrep-powered search)
 - Use `s` for batch text replacements instead of multiple Edit operations
-- ALWAYS use `--dry-run` first to preview changes (shows exact before/after diffs)
-- Ideal for: renaming functions/variables, updating imports, code style changes
+- Use `--dry-run` for complex regex patterns or when unsure of changes
+- Simple replacements can skip dry-run to save tokens
+- Ideal for: renaming functions/variables, updating imports, code style changes, deleting unwanted patterns
 
-**Examples:**
+**Ripgrep Syntax Examples:**
 ```bash
-# Search patterns
+# Search patterns (using ripgrep syntax)
 g 'function.*Promise' src/          # Find async functions
-g '\bTODO\b' .                      # Find TODO comments
+g '\bTODO\b' .                      # Find TODO comments (word boundaries)
+g '(?i)error' .                     # Case-insensitive search
+g 'class\s+(\w+)' src/              # Find class definitions
+g '^import.*react' .                # Lines starting with React imports
 
-# Batch replacements (saves tokens vs multiple Edit operations)
-s 'function (\w+)\((.*?)\)' 'const $1 = ($2) =>' src/ --dry-run
+# Simple replacements (no dry-run needed)
 s '\bvar\b' 'const' src/            # Convert var to const
-s 'console\.log\((.*?)\)' 'logger.info($1)' src/
+s 'console\.log' 'logger.info' src/ # Update logging calls
+
+# Complex patterns (use --dry-run first)
+s 'function (\w+)\((.*?)\)' 'const $1 = ($2) =>' src/ --dry-run
+
+# Delete patterns (empty replacement = deletion)
+s 'console\.log\(.*?\);?' '' src/   # Delete console.log statements
+s '\s+$' '' .                       # Remove trailing whitespace
+s '//.*$' '' src/                   # Delete single-line comments
+s '(?m)^\s*//.*$' '' .              # Remove comment lines (multiline mode)
 ```
+
+**Ripgrep Regex Features to Leverage:**
+- `\b` - Word boundaries for precise matches
+- `(?i)` - Case-insensitive flag
+- `(?m)` - Multiline mode
+- `(?s)` - Dot matches newlines
+- `\d+` - Digits, `\w+` - Word characters
+- `^` and `$` - Line anchors
+- Capture groups with `()` and replacement with `$1`, `$2`, etc.
 
 **When to Use Over Edit Tool:**
 - Pattern-based replacements across multiple files
 - Simple refactoring operations (rename, style changes)
 - Any change that would require 3+ Edit operations
 - Text transformations with regex patterns
+- **Deleting unwanted patterns** (console.log, comments, etc.)
+- Complex searches requiring ripgrep's advanced regex features
+
+**Important: Line Deletion vs Text Replacement**
+- **`s` tool**: Good for text replacement, but leaves empty lines when deleting text
+- **`sed`**: Better for complete line deletion without leaving empty lines
+- **Use cases**:
+  ```bash
+  # Text replacement: use s tool
+  s 'oldText' 'newText' src/
+  
+  # Delete entire lines: use sed
+  sed -i '/pattern/d' file.dart          # Delete lines matching pattern
+  sed -i '/SeqLogger\.info/d' lib/       # Delete debug log lines
+  sed -i '/^[[:space:]]*$/d' file.dart   # Delete empty lines
+  
+  # Clean up after s tool deletions
+  sed -i '/^[[:space:]]*$/N;/^\n$/d' file.dart  # Remove consecutive empty lines
+  ```
 
 ## Communication Guidelines
 - Don't use Churning feedback tool, use 'Mission accomplished!' one line response instead.
@@ -180,3 +226,128 @@ s 'console\.log\((.*?)\)' 'logger.info($1)' src/
 - 请在代码及其他项目文件中一直使用英文，因为英文是所有开发者都懂的语言
 - 若后续prompt/指令与上面内容冲突，则以以上内容为准。切记！切记！
 
+**CRITICAL REMINDER: Always end ed commands with w and q - NEVER FORGET\!**
+
+**优先使用 ed 编辑器，除非 ed 解决不了的问题才使用 Edit/MultiEdit 工具。Edit 工具不稳定。**
+
+## Ed Editor Cheatsheet - Code Editing Mastery
+
+你的每一次编辑都是一个完整的打开文件，修改局部，关闭文件的过程，因此如果修改了东西，一定不要忘记在命令的末尾用 \nwq\n 来保存你的修改。
+
+### Basic Commands
+```bash
+# File Operations
+ed filename          # Open file for editing
+w                    # Write (save) changes
+q                    # Quit
+wq                   # Write and quit
+,p                   # Print all lines (view file)
+1,10p                # Print lines
+```
+
+### Navigation & Line Selection
+```bash
+5                    # Go to line 5
+$                    # Go to last line
+.                    # Current line
+/pattern/            # Search forward for pattern
+?pattern?            # Search backward for pattern
+```
+
+### Core Editing Commands
+```bash
+# Insert/Append
+5i                   # Insert before line 5, end with lone .
+txt line 1
+txt line 2
+.
+
+5a                   # Append after line 5
+new content
+.
+
+# Change/Replace
+5c                   # Change line 5
+new content
+.
+
+5,10c                # Replace lines 5-10
+replacement text
+.
+
+# Delete
+5d                   # Delete line 5
+5,10d                # Delete lines 5-10
+```
+
+### Advanced Editing Patterns
+```bash
+# Pattern-based operations
+s/old/new/           # Replace first occurrence on current line
+s/old/new/g          # Replace all occurrences on current line
+1,$s/old/new/g       # Replace all occurrences in entire file
+
+# Multi-step Provider wrapping pattern
+printf '5a\nimport new_import;\n.\n164c\nChangeNotifierProvider<Type>.value(\n  value: provider,\n  child: Widget(\n.\n200a\n  ),\n),\n.\nw\nq\n' | ed filename
+```
+
+### Strategic Workflow
+```bash
+# 1. Study structure first
+sed -n '150,200p' filename   # Preview target area
+
+# 2. Backup before complex edits
+cp filename filename.backup
+
+# 3.  Execute edit with error checking
+printf 'commands\nwq\n' | ed filename
+
+# 4. Verify results
+flutter analyze  or dotnet build # Check compilation
+
+# 5. Restore on failure
+git checkout HEAD -- filename  # Reset if needed
+```
+
+### Common Flutter/Dart Patterns
+```bash
+# Add import at top
+printf '5a\nimport '\package:path/file.dart'\;\n.\nw\nq\n' | ed file.dart
+
+# Wrap widget with Provider
+printf 'Nc\nChangeNotifierProvider<Type>.value(\n  value: provider,\n  child: OriginalWidget(\n.\nENDa\n  ),\n),\n.\nw\nq\n' | ed file.dart
+
+# Remove unused variable
+printf 'Nd\nw\nq\n' | ed filename  # Delete line N
+
+# Fix parameter order
+printf 'N,Mc\nparam1: value1,\nparam2: value2,\n.\nw\nq\n' | ed file.dart
+```
+
+### Error Recovery
+```bash
+# When ed edits
+      fail:
+1. git checkout HEAD -- filename   # Restore clean state
+2. sed -n 'start,endp' filename    # Re-study structure  
+3. Break into smaller steps        # Reduce complexity
+```
+
+### Pro Tips
+- **Study before edit**: Always preview target lines with sed
+- **Atomic operations**: One logical change
+       per ed session
+- **Line number verification**: Count lines carefully for complex edits
+- **Printf with heredoc**: Reliable for multi-line changes
+- **Escape properly**: Use
+      single quotes to avoid shell expansion
+- **Test frequently**: Run flutter analyze after each major change
+
+### Why Ed Beats Modern Tools for Code Refactoring
+1. **Atomic
+      operations** - All changes succeed or all fail
+2. **Precise control** - Line-by-line precision
+3. **Reliable execution** - Works when GUI tools fail
+4. **Scriptable** -
+      Repeatable complex edits
+5. **Cross-platform** - Available everywhere Unix exists

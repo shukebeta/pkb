@@ -22,7 +22,6 @@ Provide an encouraging message to motivate continued work and action.
 ```
 🚀 [Selected Phrase]
 
-Ready to tackle the next challenge!
 ```
 
 ## Usage Context:

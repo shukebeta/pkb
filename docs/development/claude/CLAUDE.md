@@ -2,7 +2,7 @@
 
 最最重要的一条：你必须诚实对待你的内心和你的队友，我。不要因为害怕被责备而撒谎，因为那招致而来的，不仅是任务的失败，更是自身的败坏。
 
-You MUST minimize output tokens as much as possible: 言简意赅胜过长篇大论。
+You MUST minimize output tokens as much as possible: 言简意赅胜过长篇大论。默认不提供代码例子，除非我明确要求。
 
 You MUST answer concisely with fewer than 4 lines. Less is more, keep answers short, skip the fluff. 大道至简。
 
@@ -228,7 +228,23 @@ s '(?m)^\s*//.*$' '' .              # Remove comment lines (multiline mode)
 
 **CRITICAL REMINDER: Always end ed commands with w and q - NEVER FORGET\!**
 
-**优先使用 ed 编辑器，除非 ed 解决不了的问题才使用 Edit/MultiEdit 工具。Edit 工具不稳定。**
+**优先使用 eed 工具进行文件编辑！eed 是增强的 ed wrapper，比 Edit/MultiEdit 工具更稳定可靠。**
+
+## Enhanced Ed (eed) - 首选编辑工具
+
+eed 是对 ed 编辑器的强大封装，提供了更好的错误处理和使用体验。
+
+### 为什么优先使用 eed：
+- ✅ 一次授权，高效编辑
+- ✅ 自动备份恢复，永不丢失数据
+- ✅ 自动添加 w/q，永不忘记保存
+- ✅ 友好的错误信息
+- ✅ 支持复杂的多步编辑
+
+### eed 基本用法
+
+
+### eed vs 传统 ed
 
 ## Ed Editor Cheatsheet - Code Editing Mastery
 
@@ -303,10 +319,29 @@ cp filename filename.backup
 printf 'commands\nwq\n' | ed filename
 
 # 4. Verify results
-flutter analyze  or dotnet build # Check compilation
+dotnet build  # Check compilation
+# dotnet test # Run tests if available
 
 # 5. Restore on failure
 git checkout HEAD -- filename  # Reset if needed
+```
+
+### Common C#/.NET Patterns
+```bash
+# Add using statement at top
+printf '1i\nusing System.Collections.Generic;\n.\nw\nq\n' | ed file.cs
+
+# Add interface implementation
+printf 'Nc\npublic class MyClass : IMyInterface\n{\n.\nENDa\n}\n.\nw\nq\n' | ed file.cs
+
+# Remove unused variable
+printf 'Nd\nw\nq\n' | ed filename  # Delete line N
+
+# Fix method signature
+printf 'N,Mc\npublic async Task<Result> MethodName(\n    string param1,\n    int param2)\n.\nw\nq\n' | ed file.cs
+
+# Add method implementation
+printf 'Na\n\npublic async Task<bool> NewMethod()\n{\n    return await SomeOperation();\n}\n.\nw\nq\n' | ed file.cs
 ```
 
 ### Common Flutter/Dart Patterns
@@ -341,7 +376,7 @@ printf 'N,Mc\nparam1: value1,\nparam2: value2,\n.\nw\nq\n' | ed file.dart
 - **Printf with heredoc**: Reliable for multi-line changes
 - **Escape properly**: Use
       single quotes to avoid shell expansion
-- **Test frequently**: Run flutter analyze after each major change
+- **Test frequently**: Run proper build command after each major change
 
 ### Why Ed Beats Modern Tools for Code Refactoring
 1. **Atomic

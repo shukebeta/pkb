@@ -1,6 +1,21 @@
 # /eed - Enhanced Ed Editor Command
 
-## 🎯 Purpose
+
+## CRITICAL SHELL SAFETY WARNING
+
+**ALWAYS use single quotes for content to prevent shell interpretation\!**
+
+```bash
+# DANGEROUS - shell interprets backticks, variables, etc.
+eed file.txt 'content with `date` and $HOME'
+
+# SAFE - shell passes content literally
+eed file.txt 'content with backticks and $variables'
+```
+
+**Golden Rule: Single quotes for content, double quotes only for ed commands**
+
+## Purpose
 Introduces the powerful `eed` (Enhanced Ed) tool - a production-grade, non-interactive wrapper for the `ed` line editor. This tool is specifically designed for AI agents and programmatic use, providing atomic, composable file editing operations.
 
 **Stop using Edit/MultiEdit tools - use `eed` instead!**
@@ -69,67 +84,65 @@ n                         # Print with line numbers
 ### Basic Usage
 ```bash
 # Simple operations
-eed file.txt "5d"                    # Delete line 5
-eed file.txt "1,\$s/old/new/g"        # Global replace
-
+eed file.txt '5d'                    # Delete line 5
+eed file.txt '1,$s/old/new/g'        # Global replace
 # Multi-step operations (atomic)
-eed file.txt "3c" "new content" "."  # Replace line 3
-eed file.txt "5a" "new line" "."      # Insert after line 5
+eed file.txt '3c' 'new content' '.'  # Replace line 3
+eed file.txt '5a' 'new line' '.'      # Insert after line 5
 
 ### Debug Mode
 ```bash
 # When things go wrong
-eed --debug file.txt "command"
+eed --debug file.txt 'command'
 ```
-
 ## 🎯 Common Patterns
 
 ### Function Renaming
 ```bash
-eed file.js "1,$s/oldName/newName/g"
+eed file.js '1,$s/oldName/newName/g'
 ```
 
 ### Adding Imports
 ```bash
-eed file.js "1i" "import newModule from 'library';" "."
+eed file.js '1i' 'import newModule from 'library';' '.'
 ```
 
 ### Global Replace
 ```bash
-eed file.txt "1,$s/old pattern/new pattern/g"
+eed file.txt '1,$s/old pattern/new pattern/g'
 ```
 
 ## 🏆 Why eed is Superior
 
-eed myfile.js "10a" "// New comment" "newFunction();" "more code" "."
+eed myfile.js '10a' '// New comment' 'newFunction();' 'more code' '.'
 - **Auto backup/restore** - Never lose data
 - **Debug mode** - See exactly what failed
 
 ### 5. Global Delete Patterns
 ```bash
 # Remove all debug statements
-eed file.js "g/console\.log/d"
+eed file.js 'g/console\.log/d'
 
 # Remove all comments
-eed file.js "g/^[[:space:]]*\/\//d"
+eed file.js 'g/^[[:space:]]*\/\//d'
 
 # Remove empty lines
-eed file.txt "g/^[[:space:]]*$/d"
+eed file.txt 'g/^[[:space:]]*$/d'
 ```
 
 ### 6. Search and Navigate
 ```bash
 # Find and then edit
-eed file.txt "/TODO/" "c" "DONE: Fixed the issue" "."
+eed file.txt '/TODO/' 'c' 'DONE: Fixed the issue' '.'
 ```
 
 ### 7. Move and Copy Lines
 ```bash
 # Move imports to top
-eed file.js "g/^import/m0"
+eed file.js 'g/^import/m0'
 
 # Copy function to end
-eed file.js "/function myFunc/,/^}/t$"
+eed file.js '/function myFunc/,/^}/t$'
 ```
 - **Perfect for AI** - Multi-argument API ideal for programmatic use
 
@@ -141,22 +154,22 @@ eed file.js "/function myFunc/,/^}/t$"
 ### ✅ RIGHT: Multi-line insertion
 ```bash
 # Ed supports multi-line input until lone '.'
-eed file.txt "5a" "line1" "line2" "line3" "."
+eed file.txt '5a' 'line1' 'line2' 'line3' '.'
 
 # Add entire sections efficiently
-eed file.txt "10a" "## New Section" "" "Content here" "More content" "."
+eed file.txt '10a' '## New Section' '' 'Content here' 'More content' '.'
 ```
 
 ### ❌ WRONG: One line per command
 ```bash
 # DON'T do this - slow and error-prone
-eed file.txt "5a" "line1" "." "6a" "line2" "." "7a" "line3" "."
+eed file.txt '5a' 'line1' '.' '6a' 'line2' '.' '7a' 'line3' '.'
 ```
 
 ### ✅ RIGHT: Mixed operations (atomic)
 ```bash
 # Combine different operations in one call
-eed file.txt "5d" "1,$s/old/new/g" "10a" "new content" "more lines" "."
+eed file.txt '5d' '1,$s/old/new/g' '10a' 'new content' 'more lines' '.'
 ```
 
 
@@ -181,7 +194,7 @@ Most eed issues stem from ONE simple mistake: **using double quotes instead of s
 
 ```bash
 # ❌ DANGEROUS - shell interprets metacharacters
-eed file.txt "content with `date` and $HOME"
+eed file.txt 'content with `date` and $HOME'
 # Result: date command executes, $HOME expands
 
 # ✅ SAFE - shell passes literally
@@ -196,13 +209,13 @@ eed file.txt 'content with \ and \/c/Users/David.Wei'
 Only use double quotes when you INTENTIONALLY want shell expansion:
 ```bash
 # Intentional variable expansion
-eed file.txt "path: $HOME/documents"  # OK if you want $HOME expanded
+eed file.txt 'path: $HOME/documents'  # OK if you want $HOME expanded
 ```
 
 ### Mixed Quoting Strategy
 ```bash
 # Combine single quotes for safety with double quotes for ed commands
-eed file.txt "1a" 'content with `backticks` safely' "."
+eed file.txt '1a' 'content with `backticks` safely' ''
 ```
 
 ## ⚠️ Important Gotchas
@@ -212,13 +225,13 @@ When calling eed, be careful with shell special characters:
 
 ```bash
 # ❌ DANGEROUS - shell interprets backticks
-eed file.txt "text with `command` in it"
+eed file.txt 'text with `command` in it'
 
 # ✅ SAFE - use single quotes
 eed file.txt 'text with \ in it'
 
 # ❌ DANGEROUS - shell expands variables
-eed file.txt "path: $HOME/file"
+eed file.txt 'path: $HOME/file'
 
 # ✅ SAFE - escape or quote properly
 eed file.txt 'path: \/c/Users/David.Wei/file'

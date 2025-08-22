@@ -4,7 +4,9 @@
       "Bash(git remote add:*)",
       "Bash(git pull:*)",
       "Bash(git push:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(eed:*)",
+      "Bash(chmod:*)"
     ],
     "deny": []
   }

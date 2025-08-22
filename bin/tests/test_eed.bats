@@ -1,0 +1,216 @@
+#!/usr/bin/env bats
+
+# Comprehensive eed Test Suite - Converted to Bats Format
+# Tests the eed tool with all existing functionality
+# 
+# Test categories:
+# - Basic functionality (insert, delete, replace)
+# - Special character handling (quotes, dollar signs)
+# - Windows path compatibility  
+# - Error handling and backup/restore
+# - Complex multi-command operations
+# - Security validation (command injection prevention)
+
+setup() {
+    # Create unique test directory for this test run
+    TEST_DIR="$(mktemp -d)"
+    cd "$TEST_DIR"
+    
+    # Ensure we're using the local eed from bin/
+    export PATH="/home/davidwei/Projects/pkb/bin:$PATH"
+}
+
+teardown() {
+    # Clean up test directory
+    cd /
+    rm -rf "$TEST_DIR"
+}
+
+@test "basic insert operation with terminator" {
+    cat > test1.txt << 'EOF'
+line1
+line2
+line3
+line4
+line5
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test1.txt "3a" "inserted_line" "."
+    [ "$status" -eq 0 ]
+    run grep -q "inserted_line" test1.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "basic delete operation" {
+    cat > test1.txt << 'EOF'
+line1
+line2
+line3
+line4
+line5
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test1.txt "2d"
+    [ "$status" -eq 0 ]
+    run grep -q "line2" test1.txt
+    [ "$status" -ne 0 ]
+}
+
+@test "basic replace operation (global)" {
+    cat > test1.txt << 'EOF'
+line1
+line2
+line3
+line4
+line5
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test1.txt "1,\$s/line1/replaced_line1/"
+    [ "$status" -eq 0 ]
+    run grep -q "replaced_line1" test1.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "special characters - single quotes" {
+    cat > test2.txt << 'EOF'
+normal line
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test2.txt "1a" "line with 'single quotes'" "."
+    [ "$status" -eq 0 ]
+    run grep -q "line with 'single quotes'" test2.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "special characters - double quotes" {
+    cat > test2.txt << 'EOF'
+normal line
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test2.txt "2a" 'line with "double quotes"' "."
+    [ "$status" -eq 0 ]
+    run grep -q 'line with "double quotes"' test2.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "special characters - backslashes" {
+    cat > test2.txt << 'EOF'
+normal line
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test2.txt "2a" 'line with \backslash' "."
+    [ "$status" -eq 0 ]
+    run grep -q "backslash" test2.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "special characters - dollar signs" {
+    cat > test2.txt << 'EOF'
+normal line
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test2.txt "2a" 'line with $dollar sign' "."
+    [ "$status" -eq 0 ]
+    run grep -q "dollar sign" test2.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "windows path compatibility" {
+    cat > test3.txt << 'EOF'
+old_path=/usr/local/bin
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test3.txt 's|old_path=.*|new_path=C:\\Users\\Test$User\\Documents|'
+    [ "$status" -eq 0 ]
+    run grep -q "C:" test3.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "error handling - invalid command restores backup" {
+    cat > test4.txt << 'EOF'
+original content
+EOF
+    
+    # Invalid command should fail and restore backup
+    run /home/davidwei/Projects/pkb/bin/eed test4.txt "invalid_command"
+    [ "$status" -ne 0 ]
+    
+    # Original content should be preserved
+    run grep -q "original content" test4.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "complex operations - function rename" {
+    cat > test5.txt << 'EOF'
+function oldName() {
+    console.log("debug");
+    return result;
+}
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test5.txt "1,\$s/oldName/newName/"
+    [ "$status" -eq 0 ]
+    run grep -q "newName" test5.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "complex operations - console.log removal" {
+    cat > test5.txt << 'EOF'
+function newName() {
+    console.log("debug");
+    return result;
+}
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test5.txt "1,\$s/.*console\.log.*;//"
+    [ "$status" -eq 0 ]
+    run grep -q "console.log" test5.txt
+    [ "$status" -ne 0 ]
+}
+
+@test "complex operations - comment insertion" {
+    cat > test5.txt << 'EOF'
+function newName() {
+    return result;
+}
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test5.txt "2a" "    // Added comment" "."
+    [ "$status" -eq 0 ]
+    run grep -q "Added comment" test5.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "security validation - command injection resistance" {
+    cat > test6.txt << 'EOF'
+safe content
+EOF
+    
+    # Attempt command injection - should be treated as literal text
+    run /home/davidwei/Projects/pkb/bin/eed test6.txt "1a" "; rm -rf /tmp; echo malicious" "."
+    # File should still exist (injection was prevented)
+    [ -f test6.txt ]
+    # Content should include the "malicious" text as literal content
+    run grep -q "malicious" test6.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "security validation - shell metacharacters" {
+    cat > test6.txt << 'EOF'
+safe content
+EOF
+    
+    run /home/davidwei/Projects/pkb/bin/eed test6.txt "2a" "line with | & ; < > characters" "."
+    [ "$status" -eq 0 ]
+    run grep -q "characters" test6.txt
+    [ "$status" -eq 0 ]
+}
+
+@test "file creation for non-existent file" {
+    # Test that eed can create new files
+    run /home/davidwei/Projects/pkb/bin/eed newfile.txt "1i" "first line" "."
+    [ "$status" -eq 0 ]
+    [ -f newfile.txt ]
+    run grep -q "first line" newfile.txt
+    [ "$status" -eq 0 ]
+}

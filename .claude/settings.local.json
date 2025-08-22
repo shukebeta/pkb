@@ -6,7 +6,11 @@
       "Bash(git push:*)",
       "Bash(git config:*)",
       "Bash(eed:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(set)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(bin/eed:*)"
     ],
     "deny": []
   }

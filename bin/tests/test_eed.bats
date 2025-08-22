@@ -35,7 +35,11 @@ line4
 line5
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test1.txt "3a" "inserted_line" "."
+    run /home/davidwei/Projects/pkb/bin/eed test1.txt "3a
+inserted_line
+.
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "inserted_line" test1.txt
     [ "$status" -eq 0 ]
@@ -50,7 +54,9 @@ line4
 line5
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test1.txt "2d"
+    run /home/davidwei/Projects/pkb/bin/eed test1.txt "2d
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "line2" test1.txt
     [ "$status" -ne 0 ]
@@ -65,7 +71,9 @@ line4
 line5
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test1.txt "1,\$s/line1/replaced_line1/"
+    run /home/davidwei/Projects/pkb/bin/eed test1.txt "1,\$s/line1/replaced_line1/
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "replaced_line1" test1.txt
     [ "$status" -eq 0 ]
@@ -76,7 +84,11 @@ EOF
 normal line
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test2.txt "1a" "line with 'single quotes'" "."
+    run /home/davidwei/Projects/pkb/bin/eed test2.txt "1a
+line with 'single quotes'
+.
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "line with 'single quotes'" test2.txt
     [ "$status" -eq 0 ]
@@ -87,7 +99,14 @@ EOF
 normal line
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test2.txt "2a" 'line with "double quotes"' "."
+    run /home/davidwei/Projects/pkb/bin/eed test2.txt "$(cat <<'EOF'
+1a
+line with "double quotes"
+.
+w
+q
+EOF
+)"
     [ "$status" -eq 0 ]
     run grep -q 'line with "double quotes"' test2.txt
     [ "$status" -eq 0 ]
@@ -98,7 +117,14 @@ EOF
 normal line
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test2.txt "2a" 'line with \backslash' "."
+    run /home/davidwei/Projects/pkb/bin/eed test2.txt "$(cat <<'EOF'
+1a
+line with \backslash
+.
+w
+q
+EOF
+)"
     [ "$status" -eq 0 ]
     run grep -q "backslash" test2.txt
     [ "$status" -eq 0 ]
@@ -109,7 +135,14 @@ EOF
 normal line
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test2.txt "2a" 'line with $dollar sign' "."
+    run /home/davidwei/Projects/pkb/bin/eed test2.txt "$(cat <<'EOF'
+1a
+line with $dollar sign
+.
+w
+q
+EOF
+)"
     [ "$status" -eq 0 ]
     run grep -q "dollar sign" test2.txt
     [ "$status" -eq 0 ]
@@ -120,7 +153,9 @@ EOF
 old_path=/usr/local/bin
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test3.txt 's|old_path=.*|new_path=C:\\Users\\Test$User\\Documents|'
+    run /home/davidwei/Projects/pkb/bin/eed test3.txt "s|old_path=.*|new_path=C:\\Users\\Test\$User\\Documents|
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "C:" test3.txt
     [ "$status" -eq 0 ]
@@ -148,7 +183,9 @@ function oldName() {
 }
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test5.txt "1,\$s/oldName/newName/"
+    run /home/davidwei/Projects/pkb/bin/eed test5.txt "1,\$s/oldName/newName/
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "newName" test5.txt
     [ "$status" -eq 0 ]
@@ -162,7 +199,9 @@ function newName() {
 }
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test5.txt "1,\$s/.*console\.log.*;//"
+    run /home/davidwei/Projects/pkb/bin/eed test5.txt "1,\$s/.*console\.log.*;//
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "console.log" test5.txt
     [ "$status" -ne 0 ]
@@ -175,7 +214,11 @@ function newName() {
 }
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test5.txt "2a" "    // Added comment" "."
+    run /home/davidwei/Projects/pkb/bin/eed test5.txt "2a
+    // Added comment
+.
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "Added comment" test5.txt
     [ "$status" -eq 0 ]
@@ -187,7 +230,11 @@ safe content
 EOF
     
     # Attempt command injection - should be treated as literal text
-    run /home/davidwei/Projects/pkb/bin/eed test6.txt "1a" "; rm -rf /tmp; echo malicious" "."
+    run /home/davidwei/Projects/pkb/bin/eed test6.txt "1a
+; rm -rf /tmp; echo malicious
+.
+w
+q"
     # File should still exist (injection was prevented)
     [ -f test6.txt ]
     # Content should include the "malicious" text as literal content
@@ -200,7 +247,11 @@ EOF
 safe content
 EOF
     
-    run /home/davidwei/Projects/pkb/bin/eed test6.txt "2a" "line with | & ; < > characters" "."
+    run /home/davidwei/Projects/pkb/bin/eed test6.txt "1a
+line with | & ; < > characters
+.
+w
+q"
     [ "$status" -eq 0 ]
     run grep -q "characters" test6.txt
     [ "$status" -eq 0 ]
@@ -208,7 +259,11 @@ EOF
 
 @test "file creation for non-existent file" {
     # Test that eed can create new files
-    run /home/davidwei/Projects/pkb/bin/eed newfile.txt "1i" "first line" "."
+    run /home/davidwei/Projects/pkb/bin/eed newfile.txt "1i
+first line
+.
+w
+q"
     [ "$status" -eq 0 ]
     [ -f newfile.txt ]
     run grep -q "first line" newfile.txt

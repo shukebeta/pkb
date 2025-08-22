@@ -10,7 +10,8 @@
       "Bash(set)",
       "Bash(grep:*)",
       "Bash(cat:*)",
-      "Bash(bin/eed:*)"
+      "Bash(bin/eed:*)",
+      "Bash(bats test:*)"
     ],
     "deny": []
   }

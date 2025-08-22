@@ -2,15 +2,26 @@
 
 
 ## CRITICAL SHELL SAFETY WARNING
-
 **ALWAYS use single quotes for content to prevent shell interpretation\!**
 
 ```bash
 # DANGEROUS - shell interprets backticks, variables, etc.
-eed file.txt 'content with `date` and $HOME'
+eed file.txt "content with `date` and $HOME"
 
-# SAFE - shell passes content literally
+# SAFE - shell passes content literally  
 eed file.txt 'content with backticks and $variables'
+```
+
+**Golden Rule: Single quotes for content, double quotes only for ed commands**
+**ALWAYS use single quotes for content to prevent shell interpretation\!**
+
+```bash
+# DANGEROUS - shell interprets backticks, variables, etc.
+eed file.txt "content with `date` and $HOME"
+
+# SAFE - shell passes content literally  
+eed file.txt 'content with backticks and $variables'
+
 ```
 
 **Golden Rule: Single quotes for content, double quotes only for ed commands**
@@ -76,29 +87,15 @@ n                         # Print with line numbers
 ### Why eed Over Edit/MultiEdit?
 
 - **Atomic Operations**: All-or-nothing transactions vs individual operations
-- **Backup/Restore**: Automatic on failure vs manual
-- **Special Characters**: Perfect handling vs shell interpretation issues
-- **Error Recovery**: Complete rollback vs partial failures
-- **Debug Support**: Full debug mode vs limited visibility
-
 ### Basic Usage
 ```bash
 # Simple operations
 eed file.txt '5d'                    # Delete line 5
 eed file.txt '1,$s/old/new/g'        # Global replace
-# Multi-step operations (atomic)
-eed file.txt '3c' 'new content' '.'  # Replace line 3
-eed file.txt '5a' 'new line' '.'      # Insert after line 5
 
-### Debug Mode
-```bash
-# When things go wrong
-eed --debug file.txt 'command'
-```
-## 🎯 Common Patterns
-
-### Function Renaming
-```bash
+# Multi-step operations (single parameter with ed command sequence)
+eed file.txt '3c
+new content
 eed file.js '1,$s/oldName/newName/g'
 ```
 
@@ -187,6 +184,26 @@ Unlike interactive ed, eed operates in **atomic sessions**:
 2. **Plan** your complete editing sequence mentally
 3. **Self-review** your ed commands for correctness
 
+## Best Practices
+
+### Operation Ordering Rules
+
+**Golden Rule: Work backwards for line-changing operations**
+
+### Line Number Management Tips
+
+- Remember: "a" adds after line, "i" adds before line  
+- Count changes: Track how many lines added/removed
+- Use verification: "p" commands to check current state
+- Work in chunks: Break complex edits into verifiable steps
+
+### Error Prevention
+
+- Plan first: Think through the complete edit sequence
+- Test patterns: Try complex operations on small examples first  
+- Use debug mode: "eed --debug" when developing new patterns
+- Reverse order: Always work from high to low line numbers
+
 ## ⚠️ CRITICAL: Shell Quoting Rules
 
 ### The Root Cause of All Problems
@@ -215,7 +232,7 @@ eed file.txt 'path: $HOME/documents'  # OK if you want $HOME expanded
 ### Mixed Quoting Strategy
 ```bash
 # Combine single quotes for safety with double quotes for ed commands
-eed file.txt '1a' 'content with `backticks` safely' ''
+eed file.txt '1a' 'content with `backticks` safely' '.'
 ```
 
 ## ⚠️ Important Gotchas
@@ -238,9 +255,9 @@ eed file.txt 'path: \/c/Users/David.Wei/file'
 ```
 
 ### Common Problematic Characters
-- Backticks: \
-- Variables: \
-- Command substitution: \
+- Backticks: `command`
+- Variables: $HOME, $PATH
+- Command substitution: $(command)
 - Single quotes inside double quotes
 
 **Rule of thumb**: When in doubt, use single quotes around your content.
@@ -249,12 +266,64 @@ eed file.txt 'path: \/c/Users/David.Wei/file'
 ### No Manual w/q Required
 eed automatically appends 'w' (write) and 'q' (quit) to every command sequence.
 Focus on your editing logic - eed handles the session management.
-### 🔧 Pro Tips
-- Use  tool first to understand file structure
-- Multi-line content goes between command and terminating 
+### Here-Document Best Practice
+
+For complex multi-line edits, use here-document syntax for maximum clarity:
+
+```bash
+# Recommended: Here-document for complex operations  
+eed file.txt "$(cat <<'EOF'
+3c
+replacement content line 1
+replacement content line 2
+[DOT]
+5a
+new line to insert
+[DOT]
+EOF
+)"
+```
+
+Note: Replace [DOT] with actual dot (.) in real usage.
+
+**Why here-documents are superior:**
+- No complex quote escaping needed
+- Visual clarity for multi-line content  
+- Easy to copy/paste and modify
+- Reliable across different shells
+
+### Nested Here-Document Pattern
+
+When writing documentation with here-document examples, use different delimiters:
+
+```bash
+# Outer delimiter: OUTER_EOF  
+eed docs.md "$(cat <<'OUTER_EOF'
+content with inner here-doc example
+OUTER_EOF
+)"
+
+# Inner delimiter: EOF (different from outer)
+eed file.txt "$(cat <<'EOF'
+3c
+new content
+[DOT]
+EOF
+)"
+```
+
+**Critical rules:**
+- Each nesting level needs unique delimiters
+- Real dot terminates ed insert commands  
+- Let eed auto-handle w/q commands
+- Use --debug to verify parsing
+
+### Pro Tips
+- Use Read tool first to understand file structure
+- Multi-line content goes between command and terminating dot
 - All operations in one eed call = atomic transaction
-- Use  when developing complex commands
-- Remember: line numbers, content lines, then  to end input mode
+- Use --debug when developing complex commands
+- Remember: line numbers, content lines, then dot to end input mode
 
 ### Real-World Examples
 ```bash
@@ -262,7 +331,9 @@ Focus on your editing logic - eed handles the session management.
 eed script.js '1a' 'console.log(\);' '.'
 
 # Adding paths with dollars - SAFE
-eed config.txt '5a' 'export PATH=\/mingw64/bin:/usr/bin:/c/Users/David.Wei/bin:/c/oracle/product/ODAC1120320_x64:/c/oracle/product/ODAC1120320_x64/bin:/c/oracle/product/ODAC1120320_x32:/c/oracle/product/ODAC1120320_x32/bin:/c/Program Files (x86)/Common Files/Oracle/Java/java8path:/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/c/Python313/Scripts:/c/Python313:/c/Windows/system32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Program Files/Amazon/cfn-bootstrap:/c/Program Files/Microsoft SQL Server/130/Tools/Binn:/c/Program Files/Microsoft SQL Server/150/Tools/Binn:/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn:/c/Users/David.Wei/AppData/Roaming/nvm:/c/Program Files/nodejs:/c/Choco/bin:/c/WINDOWS/system32:/c/WINDOWS:/c/WINDOWS/System32/Wbem:/c/WINDOWS/System32/WindowsPowerShell/v1.0:/c/WINDOWS/System32/OpenSSH:/c/Program Files/dotnet:/c/Program Files (x86)/dotnet-core-uninstall:/c/Program Files (x86)/Yarn/bin:/c/Program Files/Puppet Labs/Puppet/bin:/c/Program Files/TortoiseSVN/bin:/c/Program Files/Microsoft VS Code/bin:/c/Users/David.Wei/AppData/Local/Microsoft/WindowsApps:/c/Users/David.Wei/AppData/Roaming/nvm:/c/Users/David.Wei/.dotnet/tools:/c/Program Files/7-Zip:/c/Program Files (x86)/NUnit.org/nunit-console:/c/Users/David.Wei/AppData/Roaming/npm:/cmd:/c/oracle/instantclient/instantclient_19_15:/c/Users/David.Wei/apps/meld:/c/Program Files/GitHub CLI:/c/Program Files/nodejs:/c/Users/David.Wei/scoop/shims:/c/oracle/product/ODAC1120320_x64:/c/oracle/product/ODAC1120320_x64/bin:/c/oracle/product/ODAC1120320_x32:/c/oracle/product/ODAC1120320_x32/bin:/c/Program Files (x86)/Common Files/Oracle/Java/java8path:/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/c/Python313/Scripts:/c/Python313:/c/Windows/system32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/c/Program Files/Amazon/cfn-bootstrap:/c/Program Files/Microsoft SQL Server/130/Tools/Binn:/c/Program Files/Microsoft SQL Server/150/Tools/Binn:/c/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn:/c/Users/David.Wei/AppData/Roaming/nvm:/c/Program Files/nodejs:/c/Choco/bin:/c/WINDOWS/system32:/c/WINDOWS:/c/WINDOWS/System32/Wbem:/c/WINDOWS/System32/WindowsPowerShell/v1.0:/c/WINDOWS/System32/OpenSSH:/c/Program Files/dotnet:/c/Program Files (x86)/dotnet-core-uninstall:/c/Program Files (x86)/Yarn/bin:/c/Program Files/Puppet Labs/Puppet/bin:/c/Program Files/TortoiseSVN/bin:/c/Program Files/Microsoft VS Code/bin:/c/Users/David.Wei/AppData/Local/Microsoft/WindowsApps:/c/Users/David.Wei/AppData/Roaming/nvm:/c/Users/David.Wei/.dotnet/tools:/c/Program Files/7-Zip:/c/Program Files (x86)/NUnit.org/nunit-console:/c/Users/David.Wei/AppData/Roaming/npm:/cmd:/c/oracle/instantclient/instantclient_19_15:/c/Users/David.Wei/apps/meld:/c/Program Files/GitHub CLI:/c/Program Files/nodejs:/c/Users/David.Wei/.local/bin:/c/Users/David.Wei/.dotnet/tools:~/bin:/c/Program Files (x86)/GnuWin32/bin:/c/Python313/  :~/.dotnet/tools  :~/bin/bats:/c/Program Files/WinMerge/ :/new/path' '.'
+eed config.txt '5a
+export PATH=$PATH:/usr/local/bin:/opt/homebrew/bin
+.'
 
 # Complex regex patterns - SAFE
 eed file.txt '1,\/old_\(.*\)_pattern/new_\1_replacement/g'

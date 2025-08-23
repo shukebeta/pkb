@@ -169,8 +169,11 @@ EOF
 
 @test "error handling - graceful handling of search failures" {
     # Search for non-existent pattern should not crash
-    run /home/davidwei/Projects/pkb/bin/eed sample.txt "/nonexistent/p
-q"
+    run /home/davidwei/Projects/pkb/bin/eed sample.txt "$(cat <<'EOF'
+/nonexistent/p
+q
+EOF
+)"
     [ "$status" -eq 0 ]
     # Should complete successfully even if pattern not found
 }

@@ -92,6 +92,9 @@ if ! detect_dot_trap "$ED_SCRIPT" >/dev/null; then
     suggest_dot_fix "$ED_SCRIPT"
 fi
 
+# --- Log Commands for Analysis ---
+log_ed_commands "$ED_SCRIPT"
+
 # Check if file exists, create if needed
 if [ ! -f "$FILE" ]; then
     echo "Creating new file: $FILE"

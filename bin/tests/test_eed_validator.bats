@@ -9,6 +9,9 @@ setup() {
 
     # Load validator functions
     source "/home/davidwei/Projects/pkb/bin/lib/eed_validator.sh"
+    
+    # Prevent logging during tests
+    export EED_TESTING=1
 }
 
 teardown() {

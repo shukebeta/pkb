@@ -18,6 +18,9 @@ setup() {
 
     # Ensure we're using the local eed from bin/
     export PATH="/home/davidwei/Projects/pkb/bin:$PATH"
+    
+    # Prevent logging during tests
+    export EED_TESTING=1
 }
 
 teardown() {

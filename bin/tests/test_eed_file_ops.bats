@@ -8,7 +8,7 @@ setup() {
     TEST_DIR="$(mktemp -d)"
     cd "$TEST_DIR"
     export PATH="/home/davidwei/Projects/pkb/bin:$PATH"
-    
+
     # Create sample file for testing
     cat > sample.txt << 'EOF'
 first line
@@ -32,7 +32,7 @@ q"
     [[ "$output" == *"first line"* ]]
     [[ "$output" == *"second line"* ]]
     [[ "$output" == *"fifth line"* ]]
-    
+
     # File should be unchanged
     run grep -c "line" sample.txt
     [ "$output" = "5" ]
@@ -85,7 +85,7 @@ q"
 
 @test "mixed workflow - view then edit then verify" {
     # Complex workflow: search, edit, verify, save
-    run /home/davidwei/Projects/pkb/bin/eed sample.txt "$(cat <<'EOF'
+    run /home/davidwei/Projects/pkb/bin/eed --force sample.txt "$(cat <<'EOF'
 /pattern/p
 .c
 replaced pattern line
@@ -96,12 +96,12 @@ q
 EOF
 )"
     [ "$status" -eq 0 ]
-    
+
     # Should show original pattern line in output
     [[ "$output" == *"second line with pattern"* ]]
-    # Should show replaced line in output  
+    # Should show replaced line in output
     [[ "$output" == *"replaced pattern line"* ]]
-    
+
     # File should be modified
     run grep -q "replaced pattern line" sample.txt
     [ "$status" -eq 0 ]
@@ -111,7 +111,7 @@ EOF
 
 @test "mixed workflow - conditional save based on verification" {
     # Edit, verify, decide whether to save
-    run /home/davidwei/Projects/pkb/bin/eed sample.txt "$(cat <<'EOF'
+    run /home/davidwei/Projects/pkb/bin/eed --force sample.txt "$(cat <<'EOF'
 1c
 TEST CHANGE
 .
@@ -124,10 +124,10 @@ q
 EOF
 )"
     [ "$status" -eq 0 ]
-    
+
     # Should show the test change during verification
     [[ "$output" == *"TEST CHANGE"* ]]
-    
+
     # File should have final change
     run grep -q "FINAL CHANGE" sample.txt
     [ "$status" -eq 0 ]
@@ -141,18 +141,18 @@ EOF
 g/pattern/n
 q"
     [ "$status" -eq 0 ]
-    
+
     # Should show line count (5) and pattern lines with numbers
     [[ "$output" == *"5"* ]]  # Total lines
-    [[ "$output" == *"2"* ]]  # First pattern line number 
+    [[ "$output" == *"2"* ]]  # First pattern line number
     [[ "$output" == *"4"* ]]  # Second pattern line number
 }
 
 @test "read-only operations preserve file integrity" {
     # Multiple read operations should not change file
     original_content=$(cat sample.txt)
-    
-    run /home/davidwei/Projects/pkb/bin/eed sample.txt "$(cat <<'EOF'  
+
+    run /home/davidwei/Projects/pkb/bin/eed sample.txt "$(cat <<'EOF'
 ,p
 1,3n
 /pattern/p
@@ -161,7 +161,7 @@ q
 EOF
 )"
     [ "$status" -eq 0 ]
-    
+
     # File should be identical
     current_content=$(cat sample.txt)
     [ "$original_content" = "$current_content" ]
@@ -169,7 +169,7 @@ EOF
 
 @test "error handling - graceful handling of search failures" {
     # Search for non-existent pattern should not crash
-    run /home/davidwei/Projects/pkb/bin/eed sample.txt "$(cat <<'EOF'
+    run /home/davidwei/Projects/pkb/bin/eed --force sample.txt "$(cat <<'EOF'
 /nonexistent/p
 q
 EOF
@@ -180,7 +180,7 @@ EOF
 
 @test "advanced viewing - multiple pattern searches" {
     # Search for multiple patterns in sequence
-    run /home/davidwei/Projects/pkb/bin/eed sample.txt "$(cat <<'EOF'
+    run /home/davidwei/Projects/pkb/bin/eed --force sample.txt "$(cat <<'EOF'
 /first/p
 g/pattern/p
 q

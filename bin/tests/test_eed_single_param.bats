@@ -22,9 +22,9 @@ line1
 line2
 line3
 EOF
-    
+
     # Single parameter containing complete ed script
-    run /home/davidwei/Projects/pkb/bin/eed test.txt "3a
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt "3a
 new line
 .
 w
@@ -40,9 +40,9 @@ line1
 line2
 line3
 EOF
-    
+
     # Test heredoc integration
-    run /home/davidwei/Projects/pkb/bin/eed test.txt "$(cat <<'EOF'
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt "$(cat <<'EOF'
 2c
 replaced line
 .
@@ -53,7 +53,7 @@ EOF
     [ "$status" -eq 0 ]
     run grep -q "replaced line" test.txt
     [ "$status" -eq 0 ]
-    run grep -q "line2" test.txt  
+    run grep -q "line2" test.txt
     [ "$status" -ne 0 ]
 }
 
@@ -61,9 +61,9 @@ EOF
     cat > test.txt << 'EOF'
 original
 EOF
-    
+
     # User manually controls w/q
-    run /home/davidwei/Projects/pkb/bin/eed test.txt "1c
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt "1c
 modified
 .
 w
@@ -79,9 +79,9 @@ line1
 line2
 line3
 EOF
-    
+
     # Multi-step workflow with intermediate save
-    run /home/davidwei/Projects/pkb/bin/eed test.txt "1c
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt "1c
 changed1
 .
 w
@@ -101,9 +101,9 @@ q"
     cat > test.txt << 'EOF'
 original
 EOF
-    
+
     # Script without w should warn but not fail
-    run /home/davidwei/Projects/pkb/bin/eed test.txt "1c
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt "1c
 modified
 .
 Q"
@@ -120,9 +120,9 @@ Q"
     cat > test.txt << 'EOF'
 original
 EOF
-    
+
     # Script without q should still complete
-    run /home/davidwei/Projects/pkb/bin/eed test.txt "1c
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt "1c
 modified
 .
 w"
@@ -135,9 +135,9 @@ w"
     cat > test.txt << 'EOF'
 placeholder
 EOF
-    
+
     # Test complex content with quotes and special characters
-    run /home/davidwei/Projects/pkb/bin/eed test.txt "$(cat <<'OUTER'
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt "$(cat <<'OUTER'
 1c
 Content with 'single' and "double" quotes
 Line with $dollar and `backticks`
@@ -160,9 +160,9 @@ OUTER
     cat > test.txt << 'EOF'
 original
 EOF
-    
+
     # Old multi-parameter syntax should fail with helpful error
-    run /home/davidwei/Projects/pkb/bin/eed test.txt "1c" "new content" "."
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt "1c" "new content" "."
     [ "$status" -ne 0 ]
     [[ "$output" == *"single parameter"* ]] || [[ "$output" == *"heredoc"* ]]
 }
@@ -171,9 +171,9 @@ EOF
     cat > test.txt << 'EOF'
 original content
 EOF
-    
+
     # Empty ed script should do nothing
-    run /home/davidwei/Projects/pkb/bin/eed test.txt ""
+    run /home/davidwei/Projects/pkb/bin/eed --force test.txt ""
     [ "$status" -eq 0 ]
     run grep -q "original content" test.txt
     [ "$status" -eq 0 ]

@@ -241,3 +241,4 @@ w"
     [ "$status" -eq 0 ]
     [ "$output" = "view_only" ]
 }
+

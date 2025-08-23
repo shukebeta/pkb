@@ -154,6 +154,81 @@ suggest_dot_fix() {
     return 0
 }
 
+# Detect complex patterns that are unsafe for automatic reordering
+detect_complex_patterns() {
+    local script="$1"
+    local line
+    local -a addresses=()
+    local -a intervals=()
+    local in_g_block=false
+
+    while IFS= read -r line; do
+        # Skip empty lines and comments
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+
+        # Detect g/v blocks
+        if [[ "$line" =~ ^[[:space:]]*[gvGV]/ ]]; then
+            echo "COMPLEX: g/v block command detected: $line" >&2
+            return 1
+        fi
+
+        # Detect non-numeric addresses at start of commands only
+        if [[ "$line" =~ ^[[:space:]]*[\./\?][^[:space:]] ]]; then
+            echo "COMPLEX: Non-numeric address detected: $line" >&2
+            return 1
+        fi
+
+        # Detect offset addresses
+        if [[ "$line" =~ ^[[:space:]]*[\.\$][+-][0-9] ]]; then
+            echo "COMPLEX: Offset address detected: $line" >&2
+            return 1
+        fi
+
+        # Detect move/transfer/read commands
+        if [[ "$line" =~ ^[[:space:]]*[0-9]*,?[0-9]*[mMtTrR] ]]; then
+            echo "COMPLEX: Move/transfer/read command detected: $line" >&2
+            return 1
+        fi
+
+        # Extract numeric addresses and check for overlaps
+        if [[ "$line" =~ ^([0-9]+)(,([0-9]+|\$))?([dDcCbBiIaAsS]) ]]; then
+            local start="${BASH_REMATCH[1]}"
+            local end="${BASH_REMATCH[3]:-$start}"
+            local cmd="${BASH_REMATCH[4]}"
+
+            # Convert $ to a high number for comparison
+            [[ "$end" == "\$" ]] && end="999999"
+
+            # Check for interval overlaps with existing ranges
+            for existing in "${intervals[@]}"; do
+                local ex_start="${existing%%:*}"
+                local ex_end="${existing##*:}"
+
+                # Check if intervals overlap
+                if (( start <= ex_end && end >= ex_start )); then
+                    echo "COMPLEX: Overlapping intervals detected: $start-$end vs $ex_start-$ex_end" >&2
+                    return 1
+                fi
+            done
+
+            intervals+=("$start:$end")
+            addresses+=("$start")
+        fi
+    done <<< "$script"
+
+    # Check for same-address conflicts
+    local -A addr_count
+    for addr in "${addresses[@]}"; do
+        ((addr_count[$addr]++))
+        if (( addr_count[$addr] > 1 )); then
+            echo "COMPLEX: Multiple operations on same address: $addr" >&2
+            return 1
+        fi
+    done
+
+    return 0  # No complex patterns detected
+}
+
 # Automatically reorder ed script commands to prevent line number conflicts
 # Returns reordered script via stdout, shows user-friendly messages via stderr
 reorder_script_if_needed() {
@@ -163,6 +238,17 @@ reorder_script_if_needed() {
     local -a modifying_commands=()
     local -a modifying_line_numbers=()
     local line_index=0
+
+    # Step 0: Check for complex patterns first
+    if ! detect_complex_patterns "$script"; then
+        echo "⚠️ Complex patterns detected. Auto-reordering disabled for safety." >&2
+        while IFS= read -r line; do
+            script_lines+=("$line")
+        done <<< "$script"
+        printf '%s\n' "${script_lines[@]}"  # Output original script
+        return 0
+    fi
+
 
     # Step 1: Parse script and collect all lines and modifying commands
     while IFS= read -r line; do
@@ -205,7 +291,7 @@ reorder_script_if_needed() {
 
     # Sort modifying commands by line number in descending order
     local -a sorted_modifying_commands
-    mapfile -t sorted_modifying_commands < <(printf '%s\n' "${modifying_commands[@]}" | sort -t: -k2,2nr)
+    mapfile -t sorted_modifying_commands < <(printf '%s\n' "${modifying_commands[@]}" | sort -s -t: -k2,2nr -k1,1n)
 
     local reverse_sorted_line_numbers
     mapfile -t reverse_sorted_line_numbers < <(printf '%s\n' "${modifying_line_numbers[@]}" | sort -nr)
@@ -222,10 +308,10 @@ reorder_script_if_needed() {
     for cmd_info in "${sorted_modifying_commands[@]}"; do
         local old_index="${cmd_info%%:*}"
         local cmd_line="${cmd_info##*:}"
-        
+
         reordered_script+=("$cmd_line")
         processed_indices+=("$old_index")
-        
+
         # If this is an input mode command (a, c, i), include following content until "."
         if [[ "$cmd_line" =~ [aAcCiI]$ ]]; then
             local content_idx=$((old_index + 1))

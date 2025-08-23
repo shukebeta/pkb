@@ -1,10 +1,11 @@
 #!/bin/bash
 # Enhanced ed wrapper with Modify-Preview-Confirm workflow
-# Usage: eed [--debug] [--force] <file> <ed_commands...>
+# Usage: eed [--debug] [--force] [--disable-auto-reorder] <file> <ed_commands...>
 #
 # Options:
 #   --debug    Enable debug mode (preserve temp files, show ed output)
 #   --force    Skip preview-confirm workflow, edit file directly
+#   --disable-auto-reorder  Disable automatic script reordering
 #
 # Examples:
 #   eed file.txt "5d"                           # Delete line 5 (with preview)
@@ -23,6 +24,7 @@ source "$SCRIPT_DIR/lib/eed_validator.sh"
 # --- Argument Parsing & Mode Handling ---
 DEBUG_MODE=false
 FORCE_MODE=false
+DISABLE_AUTO_REORDER=false
 
 # Parse flags with proper argument handling
 while [ $# -gt 0 ]; do
@@ -33,6 +35,10 @@ while [ $# -gt 0 ]; do
             ;;
         --force)
             FORCE_MODE=true
+            shift
+            ;;
+        --disable-auto-reorder)
+            DISABLE_AUTO_REORDER=true
             shift
             ;;
         -*)
@@ -49,11 +55,12 @@ done
 # Enforce single parameter mode after parsing flags
 if [ $# -ne 2 ]; then
     echo "Error: eed now uses single-parameter mode only" >&2
-    echo "Usage: eed [--debug] [--force] <file> <ed_script>" >&2
+    echo "Usage: eed [--debug] [--force] [--disable-auto-reorder] <file> <ed_script>" >&2
     echo "" >&2
     echo "Options:" >&2
     echo "  --debug    Enable debug mode (preserve temp files, show ed output)" >&2
     echo "  --force    Skip preview-confirm workflow, edit file directly" >&2
+    echo "  --disable-auto-reorder  Disable automatic script reordering" >&2
     echo "" >&2
     echo "Use heredoc syntax for complex operations:" >&2
     echo 'Example with heredoc:' >&2
@@ -97,10 +104,12 @@ log_ed_commands "$ED_SCRIPT"
 
 # --- Automatic Script Reordering for Line Number Safety ---
 # Get potentially reordered script to prevent line numbering conflicts
-REORDERED_SCRIPT=$(reorder_script_if_needed "$ED_SCRIPT")
-if [ $? -eq 1 ]; then
-    # Reordering was performed, use the reordered script
-    ED_SCRIPT="$REORDERED_SCRIPT"
+if [ "$DISABLE_AUTO_REORDER" = "false" ]; then
+    REORDERED_SCRIPT=$(reorder_script_if_needed "$ED_SCRIPT")
+    if [ $? -eq 1 ]; then
+        # Reordering was performed, use the reordered script
+        ED_SCRIPT="$REORDERED_SCRIPT"
+    fi
 fi
 
 # Check if file exists, create if needed

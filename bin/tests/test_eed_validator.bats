@@ -480,3 +480,65 @@ q"
     [[ "$output" == *"inserted at 20"* ]]
 }
 
+
+# Complex pattern detection tests
+@test "complex pattern detection: g/v blocks are detected" {
+    local script="$(printf '1d\ng/pattern/d\n2d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering due to complex pattern
+    [[ "$output" == *"1d"* ]]
+    [[ "$output" == *"g/pattern/d"* ]]
+    [[ "$output" == *"2d"* ]]
+}
+
+@test "complex pattern detection: non-numeric addresses are detected" {
+    local script="$(printf '1d\n./pattern/d\n3d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering due to complex pattern
+    [[ "$output" == *"1d"* ]]
+    [[ "$output" == *"./pattern/d"* ]]
+    [[ "$output" == *"3d"* ]]
+}
+
+@test "complex pattern detection: overlapping intervals are detected" {
+    local script="$(printf '5a\nappended line\n.\n3,5d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering due to complex pattern (5a overlaps with 3,5d)
+    [[ "$output" == *"5a"* ]]
+    [[ "$output" == *"3,5d"* ]]
+}
+
+@test "complex pattern detection: move/transfer commands are detected" {
+    local script="$(printf '1d\n2m4\n3d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering due to complex pattern
+    [[ "$output" == *"1d"* ]]
+    [[ "$output" == *"2m4"* ]]
+    [[ "$output" == *"3d"* ]]
+}
+
+@test "complex pattern detection: multiple operations on same address are detected" {
+    local script="$(printf '1d\n1i\nnew line\n.\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering due to complex pattern
+    [[ "$output" == *"1d"* ]]
+    [[ "$output" == *"1i"* ]]
+}
+
+@test "complex pattern detection: simple numeric patterns still allow reordering" {
+    local script="$(printf '1d\n3d\n5d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Reordering performed - no complex patterns detected
+    # Should be reordered to 5d, 3d, 1d
+    local output_lines=()
+    while IFS= read -r line; do output_lines+=("$line"); done <<< "$output"
+    local pos_5d=-1 pos_3d=-1 pos_1d=-1
+    for i in "${!output_lines[@]}"; do
+        [[ "${output_lines[$i]}" == "5d" ]] && pos_5d=$i
+        [[ "${output_lines[$i]}" == "3d" ]] && pos_3d=$i
+        [[ "${output_lines[$i]}" == "1d" ]] && pos_1d=$i
+    done
+    [ "$pos_5d" -lt "$pos_3d" ]
+    [ "$pos_3d" -lt "$pos_1d" ]
+}
+

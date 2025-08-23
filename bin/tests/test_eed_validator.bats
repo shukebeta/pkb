@@ -542,3 +542,14 @@ q"
     [ "$pos_3d" -lt "$pos_1d" ]
 }
 
+@test "exclamation mark preservation: bash array syntax should not be escaped" {
+    # Test that exclamation marks in bash array syntax are preserved correctly
+    set +H  # Ensure history expansion is disabled in test
+    local script="$(set +H; printf '3a\necho \"Array indices: \${!arr[@]}\"\n.\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering needed for single command
+    # Verify the exclamation mark is preserved (not escaped as \!)
+    [[ "$output" == *'${!arr[@]}'* ]]
+    [[ "$output" != *'${\\!arr[@]}'* ]]
+}
+

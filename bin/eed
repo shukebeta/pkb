@@ -38,7 +38,7 @@ if [ $# -ne 2 ]; then
     echo 'Example with heredoc:' >&2
     echo 'eed file.txt "$(cat <<EOF_EXAMPLE' >&2
     echo '3c' >&2
-    echo 'new content' >&2  
+    echo 'new content' >&2
     echo '.' >&2
     echo 'w' >&2
     echo 'q' >&2
@@ -71,9 +71,16 @@ if [ ! -f "$FILE" ]; then
     echo > "$FILE"  # Create file with one empty line instead of zero bytes
 fi
 
-# Classify script to determine backup strategy
+# Classify and validate script
 SCRIPT_TYPE=$(classify_ed_script "$ED_SCRIPT")
-# Debug classification output removed for production
+
+# Handle invalid commands before executing ed
+if [ "$SCRIPT_TYPE" = "invalid_command" ]; then
+    echo "✗ Error: Invalid ed command detected" >&2
+    echo "Script contains unrecognized commands:" >&2
+    echo "$ED_SCRIPT" >&2
+    exit 1
+fi
 
 # Create backup only for modifying scripts
 if [ "$SCRIPT_TYPE" = "has_modifying" ]; then
@@ -127,10 +134,9 @@ case $ED_EXIT_CODE in
         ;;
     1)
         # Command failed - decision based on script type
-# Debug output removed for production
         if [ "$SCRIPT_TYPE" = "view_only" ]; then
-            # View operations can fail gracefully (e.g., pattern not found)
-            echo "✓ View operation completed (no matches found)"
+            # View operations (including invalid commands) fail gracefully
+            echo "✓ View operation completed (no matches found or invalid command)"
             # No backup to clean up for view_only scripts
             exit 0
         else
@@ -153,7 +159,7 @@ case $ED_EXIT_CODE in
         exit 2
         ;;
     3)
-        # Internal ed error - always fail  
+        # Internal ed error - always fail
         echo "✗ Internal ed error, restoring backup" >&2
         if [ "$BACKUP_CREATED" = true ]; then
             mv "$FILE.eed.bak" "$FILE"

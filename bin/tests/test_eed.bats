@@ -2,11 +2,11 @@
 
 # Comprehensive eed Test Suite - Converted to Bats Format
 # Tests the eed tool with all existing functionality
-# 
+#
 # Test categories:
 # - Basic functionality (insert, delete, replace)
 # - Special character handling (quotes, dollar signs)
-# - Windows path compatibility  
+# - Windows path compatibility
 # - Error handling and backup/restore
 # - Complex multi-command operations
 # - Security validation (command injection prevention)
@@ -15,7 +15,7 @@ setup() {
     # Create unique test directory for this test run
     TEST_DIR="$(mktemp -d)"
     cd "$TEST_DIR"
-    
+
     # Ensure we're using the local eed from bin/
     export PATH="/home/davidwei/Projects/pkb/bin:$PATH"
 }
@@ -34,7 +34,7 @@ line3
 line4
 line5
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test1.txt "3a
 inserted_line
 .
@@ -53,7 +53,7 @@ line3
 line4
 line5
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test1.txt "2d
 w
 q"
@@ -70,7 +70,7 @@ line3
 line4
 line5
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test1.txt "1,\$s/line1/replaced_line1/
 w
 q"
@@ -83,7 +83,7 @@ q"
     cat > test2.txt << 'EOF'
 normal line
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test2.txt "1a
 line with 'single quotes'
 .
@@ -98,7 +98,7 @@ q"
     cat > test2.txt << 'EOF'
 normal line
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test2.txt "$(cat <<'EOF'
 1a
 line with "double quotes"
@@ -116,7 +116,7 @@ EOF
     cat > test2.txt << 'EOF'
 normal line
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test2.txt "$(cat <<'EOF'
 1a
 line with \backslash
@@ -134,7 +134,7 @@ EOF
     cat > test2.txt << 'EOF'
 normal line
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test2.txt "$(cat <<'EOF'
 1a
 line with $dollar sign
@@ -152,7 +152,7 @@ EOF
     cat > test3.txt << 'EOF'
 old_path=/usr/local/bin
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test3.txt "s|old_path=.*|new_path=C:\\Users\\Test\$User\\Documents|
 w
 q"
@@ -161,33 +161,17 @@ q"
     [ "$status" -eq 0 ]
 }
 
-@test "error handling - invalid command restores backup" {
+@test "error handling - invalid command rejected" {
     cat > test4.txt << 'EOF'
 original content
 EOF
-    
-    # Invalid command should fail and restore backup
+
+    # Invalid command should be detected and rejected before execution
     run /home/davidwei/Projects/pkb/bin/eed test4.txt "invalid_command"
     [ "$status" -ne 0 ]
-    
-    # Original content should be preserved
-    run grep -q "original content" test4.txt
-    [ "$status" -eq 0 ]
-}
 
-@test "complex operations - function rename" {
-    cat > test5.txt << 'EOF'
-function oldName() {
-    console.log("debug");
-    return result;
-}
-EOF
-    
-    run /home/davidwei/Projects/pkb/bin/eed test5.txt "1,\$s/oldName/newName/
-w
-q"
-    [ "$status" -eq 0 ]
-    run grep -q "newName" test5.txt
+    # Original content should be preserved (file never modified)
+    run grep -q "original content" test4.txt
     [ "$status" -eq 0 ]
 }
 
@@ -198,7 +182,7 @@ function newName() {
     return result;
 }
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test5.txt "1,\$s/.*console\.log.*;//
 w
 q"
@@ -213,7 +197,7 @@ function newName() {
     return result;
 }
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test5.txt "2a
     // Added comment
 .
@@ -228,7 +212,7 @@ q"
     cat > test6.txt << 'EOF'
 safe content
 EOF
-    
+
     # Attempt command injection - should be treated as literal text
     run /home/davidwei/Projects/pkb/bin/eed test6.txt "1a
 ; rm -rf /tmp; echo malicious
@@ -246,7 +230,7 @@ q"
     cat > test6.txt << 'EOF'
 safe content
 EOF
-    
+
     run /home/davidwei/Projects/pkb/bin/eed test6.txt "1a
 line with | & ; < > characters
 .

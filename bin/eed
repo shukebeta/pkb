@@ -16,6 +16,9 @@
 #   eed file.txt "s/old/new/g"                  # Replace all 'old' with 'new' on current line
 #   eed file.txt "1,\$s/old/new/g"              # Replace all 'old' with 'new' in entire file
 
+# Disable history expansion to prevent ! character escaping
+set +H
+
 # Load library functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/eed_common.sh"

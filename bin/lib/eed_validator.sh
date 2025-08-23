@@ -7,6 +7,9 @@ if [ "${EED_VALIDATOR_LOADED:-}" = "1" ]; then
 fi
 EED_VALIDATOR_LOADED=1
 
+# Disable history expansion to prevent ! character escaping
+set +H
+
 # Validate ed script for basic requirements
 validate_ed_script() {
     local script="$1"

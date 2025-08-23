@@ -20,17 +20,18 @@ When creating documentation/guides:
 
 ## File Organization
 
-- Place guides in `docs/guides/` 
+- Place guides in `docs/guides/`
 - Use descriptive, kebab-case filenames
 - Follow existing directory structure patterns
 
 ## Writing Style
 
 - Bullet points over paragraphs
-- Code examples over descriptions  
+- Code examples over descriptions
 - One-sentence explanations maximum
 - No unnecessary pleasantries or confirmations
 
 ## Git Workflow Practices
 
 - After updating the README.md file, proactively commit the changes you made and push them to remote
+- 总是在子shell里工作以避免不小心破坏当前路径的值

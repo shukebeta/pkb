@@ -57,7 +57,6 @@ done
 
 # Enforce single parameter mode after parsing flags
 if [ $# -ne 2 ]; then
-    echo "Error: eed now uses single-parameter mode only" >&2
     echo "Usage: eed [--debug] [--force] [--disable-auto-reorder] <file> <ed_script>" >&2
     echo "" >&2
     echo "Options:" >&2
@@ -65,16 +64,16 @@ if [ $# -ne 2 ]; then
     echo "  --force    Skip preview-confirm workflow, edit file directly" >&2
     echo "  --disable-auto-reorder  Disable automatic script reordering" >&2
     echo "" >&2
-    echo "Use heredoc syntax for complex operations:" >&2
-    echo 'Example with heredoc:' >&2
-    echo 'eed file.txt "$(cat <<EOF_EXAMPLE' >&2
-    echo '3c' >&2
-    echo 'new content' >&2
-    echo '.' >&2
-    echo 'w' >&2
-    echo 'q' >&2
-    echo 'EOF_EXAMPLE' >&2
-    echo ')"' >&2
+    echo "Use a quoted heredoc to pass complex ed scripts without shell expansion." >&2
+    echo "Example (quoted heredoc prevents variable/backslash expansion):" >&2
+    echo "eed file.txt \"\$(cat <<'EOF_EXAMPLE'" >&2
+    echo "3c" >&2
+    echo "new content" >&2
+    echo "." >&2
+    echo "w" >&2
+    echo "q" >&2
+    echo "EOF_EXAMPLE" >&2
+    echo '")' >&2
     exit 1
 fi
 

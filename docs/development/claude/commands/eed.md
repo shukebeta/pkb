@@ -2,69 +2,71 @@
 
 ## Overview
 
-`eed` (Enhanced Ed) is a production-grade, non-interactive wrapper for the `ed` line editor, designed for AI agents and programmatic use. It provides atomic file editing operations 
-with built-in safety features.
+`eed` is a non-interactive wrapper around `ed` that makes programmatic editing safe: preview changes, back up atomically, then apply.
 
 **Key Features:**
-- **Preview-Confirm Workflow** - See changes before applying (default)
-- **Atomic Operations** - All-or-nothing transactions
-- **Automatic Backup/Restore** - Never lose data
-- **Smart Command Classification** - Distinguishes view vs modify operations
+- **Preview-Confirm** — preview diffs before applying
+- **Atomic** — all-or-nothing edits
+- **Backup** — edits written to `<file>.eed.bak` in preview mode
+- **Smart** — classifies view vs modify commands
 
 ## Quick Start
 
 ```bash
-# View operations execute immediately
-eed file.txt ',p
-q'
+# View operations execute immediately (use quoted heredoc to avoid shell expansion)
+eed file.txt "$(cat <<'EOF'
+,p
+q
+EOF
+ )"
 
 # Modify operations show preview by default
-eed file.txt '5d
+eed file.txt "$(cat <<'EOF'
+5d
 w
-q'
+q
+EOF
+ )"
 
-# Use --force to edit directly (old behavior)
-eed --force file.txt '5d
+# Use --force to edit directly (trusted changes)
+eed --force file.txt "$(cat <<'EOF'
+5d
 w
-q'
+q
+EOF
+ )"
 ```
 
 ## Usage Syntax
 
 ```bash
-eed [--debug] [--force] <file> <ed_script>
+eed [--debug] [--force] [--disable-auto-reorder] <file> <ed_script>
 ```
 
 **Options:**
 - `--debug` - Show detailed execution info, preserve temp files
 - `--force` - Skip preview mode, edit file directly
+- `--disable-auto-reorder` - Disable automatic script reordering (useful when edits depend on a fixed sequence of line numbers)
 
 ## The Preview-Confirm Workflow
-
-### Default Behavior for Modifications
-
-When you run a modifying operation, eed:
-
-1. **Executes on a copy** - Original file stays untouched
-2. **Shows unified diff** - See exactly what changed
-3. **Provides clear instructions** - Copy-paste commands to apply/discard
-
-Example:
+Example (canonical quoted heredoc form):
 ```bash
-$ eed sample.txt '2c
+eed sample.txt "$(cat <<'EOF'
+2c
 new content
 .
 w
-q'
+q
+EOF
+ )"
 
-✓ Edits applied to a temporary backup. Review the changes below:
+✓ Edits are applied to `<file>.eed.bak`; review the diff and decide to apply or discard.
 
 --- sample.txt	2025-08-23 14:30:15.000000000 +1200
-+++ sample.txt.eed.bak	2025-08-23 14:30:20.000000000 +1200
+++ sample.txt.eed.bak	2025-08-23 14:30:20.000000000 +1200
 @@ -1,3 +1,3 @@
  line1
--line2
-+new content
+new content
  line3
 
 To apply these changes, run:
@@ -76,13 +78,19 @@ To discard these changes, run:
 
 ### View Operations Execute Directly
 
-Read-only operations bypass preview mode:
+Read-only operations run immediately; still prefer quoted heredoc for safety:
 ```bash
-eed file.txt ',p    # Shows content immediately
-q'
+eed file.txt "$(cat <<'EOF'
+,p
+q
+EOF
+ )"
 
-eed file.txt 'g/pattern/p    # Searches and displays
-q'
+eed file.txt "$(cat <<'EOF'
+g/pattern/p
+q
+EOF
+ )"
 ```
 
 ## Ed Command Reference
@@ -128,8 +136,11 @@ q           # Quit
 
 ## Best Practices
 
-### 1. Use Heredoc for Complex Operations
+### Shell safety & quoting (preferred)
 
+Always use a quoted heredoc (<<'EOF') so the shell doesn't expand variables or backticks.
+
+Canonical heredoc pattern:
 ```bash
 eed file.txt "$(cat <<'EOF'
 /function/
@@ -140,71 +151,69 @@ s/oldName/newName/g
 w
 q
 EOF
-)"
+ )"
 ```
 
-### 2. Always End with w and q
+### Always end with w and q
+
+Save explicitly: end scripts with `w` and `q`.
 
 ```bash
-# Correct - saves and exits
-eed file.txt '5d
+eed file.txt "$(cat <<'EOF'
+5d
 w
-q'
-
-# Wrong - changes not saved
-eed file.txt '5d
-q'
+q
+EOF
+ )"
 ```
 
-### 3. Work Backwards for Line Operations
+### Work backwards for line-number edits
+
+When deleting multiple line numbers, start from the end to avoid shifting.
 
 ```bash
-# Good - work from end to beginning
-eed file.txt '10d
+eed file.txt "$(cat <<'EOF'
+10d
 5d
 1d
 w
-q'
-
-# Bad - line numbers shift unexpectedly
-eed file.txt '1d
-5d
-10d
-w
-q'
+q
+EOF
+ )"
 ```
 
-### 4. Use --debug for Development
+### Use --debug for development
 
+`--debug` preserves temp files and prints the temporary command file and ed output.
+
+Example debug snippet:
 ```bash
-eed --debug file.txt 'complex script here'
-# Shows temp file contents and ed execution details
+eed --debug file.txt "$(cat <<'EOF'
+5d
+w
+q
+EOF
+ )"
+# Debug shows the temp command file and ed output
 ```
 
 ## Shell Safety Rules
 
-### Critical: Quote Content Properly
+Quote or use quoted heredoc to avoid shell expansion.
 
 ```bash
-# DANGEROUS - shell expands variables and commands
+# BAD: shell expands $HOME and `date`
 eed file.txt "content with $HOME and `date`"
 
-# SAFE - single quotes preserve literally
-eed file.txt 'content with $HOME and `date`'
-```
-
-### Heredoc is Safest for Complex Content
-
-```bash
+# GOOD: preserve literally
 eed file.txt "$(cat <<'EOF'
 1a
 Content with 'quotes', $variables, and `backticks`
-All preserved literally inside heredoc
 .
 w
 q
 EOF
-)"
+ )"
 ```
 
 ## Common Patterns
@@ -255,6 +264,15 @@ q
 EOF
 )"
 ```
+
+## Exit Codes
+
+eed uses a small set of exit codes useful for automation:
+
+- `0` - Success (view or applied edit)
+- `1` - Usage error or general `ed`-level error
+- `2` - File I/O error
+- `3` - Internal `ed` error
 
 ## Error Recovery
 

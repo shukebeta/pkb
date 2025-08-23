@@ -1,355 +1,334 @@
-# /eed - Enhanced Ed Editor Command
+# eed - Enhanced Ed Editor with Preview-Confirm Workflow
 
+## Overview
 
-## CRITICAL SHELL SAFETY WARNING
-**ALWAYS use single quotes for content to prevent shell interpretation\!**
+`eed` (Enhanced Ed) is a production-grade, non-interactive wrapper for the `ed` line editor, designed for AI agents and programmatic use. It provides atomic file editing operations 
+with built-in safety features.
+
+**Key Features:**
+- **Preview-Confirm Workflow** - See changes before applying (default)
+- **Atomic Operations** - All-or-nothing transactions
+- **Automatic Backup/Restore** - Never lose data
+- **Smart Command Classification** - Distinguishes view vs modify operations
+
+## Quick Start
 
 ```bash
-# DANGEROUS - shell interprets backticks, variables, etc.
-eed file.txt "content with `date` and $HOME"
+# View operations execute immediately
+eed file.txt ',p
+q'
 
-# SAFE - shell passes content literally  
-eed file.txt 'content with backticks and $variables'
+# Modify operations show preview by default
+eed file.txt '5d
+w
+q'
+
+# Use --force to edit directly (old behavior)
+eed --force file.txt '5d
+w
+q'
 ```
 
-**Golden Rule: Single quotes for content, double quotes only for ed commands**
-**ALWAYS use single quotes for content to prevent shell interpretation\!**
+## Usage Syntax
 
 ```bash
-# DANGEROUS - shell interprets backticks, variables, etc.
-eed file.txt "content with `date` and $HOME"
-
-# SAFE - shell passes content literally  
-eed file.txt 'content with backticks and $variables'
-
+eed [--debug] [--force] <file> <ed_script>
 ```
 
-**Golden Rule: Single quotes for content, double quotes only for ed commands**
+**Options:**
+- `--debug` - Show detailed execution info, preserve temp files
+- `--force` - Skip preview mode, edit file directly
 
-## Purpose
-Introduces the powerful `eed` (Enhanced Ed) tool - a production-grade, non-interactive wrapper for the `ed` line editor. This tool is specifically designed for AI agents and programmatic use, providing atomic, composable file editing operations.
+## The Preview-Confirm Workflow
 
-**Stop using Edit/MultiEdit tools - use `eed` instead!**
+### Default Behavior for Modifications
 
-## 📚 Ed Editor Quick Reference
+When you run a modifying operation, eed:
 
-### Basic Navigation & Operations
+1. **Executes on a copy** - Original file stays untouched
+2. **Shows unified diff** - See exactly what changed
+3. **Provides clear instructions** - Copy-paste commands to apply/discard
+
+Example:
 ```bash
-# Line addressing
-5           # Go to line 5
+$ eed sample.txt '2c
+new content
+.
+w
+q'
+
+✓ Edits applied to a temporary backup. Review the changes below:
+
+--- sample.txt	2025-08-23 14:30:15.000000000 +1200
++++ sample.txt.eed.bak	2025-08-23 14:30:20.000000000 +1200
+@@ -1,3 +1,3 @@
+ line1
+-line2
++new content
+ line3
+
+To apply these changes, run:
+  mv 'sample.txt.eed.bak' 'sample.txt'
+
+To discard these changes, run:
+  rm 'sample.txt.eed.bak'
+```
+
+### View Operations Execute Directly
+
+Read-only operations bypass preview mode:
+```bash
+eed file.txt ',p    # Shows content immediately
+q'
+
+eed file.txt 'g/pattern/p    # Searches and displays
+q'
+```
+
+## Ed Command Reference
+
+### Basic Line Addressing
+```bash
+5           # Line 5
 $           # Last line
 .           # Current line
 1,5         # Lines 1 through 5
-1,$         # Entire file (line 1 to last line)
+1,$         # Entire file
 ```
 
-### Core Editing Commands
+### Essential Commands
 ```bash
-# Delete
+# View
+,p          # Print all lines
+1,5p        # Print lines 1-5
+=           # Show line count
+n           # Print with line numbers
+
+# Edit
 5d          # Delete line 5
 1,5d        # Delete lines 1-5
-2,$d        # Delete from line 2 to end
-
-# Insert/Append
 5i          # Insert before line 5 (end with .)
 5a          # Append after line 5 (end with .)
-
-# Change/Replace
-5c          # Replace line 5 (end with .)
-1,3c        # Replace lines 1-3 (end with .)
+5c          # Change line 5 (end with .)
 
 # Search & Replace
-s/old/new/g              # Replace all old with new on current line
-1,$s/old/new/g          # Replace all old with new in entire file
+/pattern/   # Find pattern
+s/old/new/g # Replace all on current line
+1,$s/old/new/g  # Replace all in file
 
-# Search Navigation
-/pattern/                  # Find next line containing pattern
-?pattern?                 # Find previous line containing pattern
+# Global Operations
+g/pattern/d     # Delete all lines with pattern
+g/pattern/p     # Print all lines with pattern
+v/pattern/d     # Delete all lines WITHOUT pattern
 
-# Global Operations (AI Powerhouse!)
-g/pattern/d               # Delete all lines containing pattern
-g/pattern/s/old/new/g     # Replace in all matching lines
-v/pattern/d               # Delete all lines NOT containing pattern
-
-# Line Operations
-5m0                       # Move line 5 to beginning
-1,3t$                     # Copy lines 1-3 to end
-u                         # Undo last operation
-u                         # Undo (NOT needed in eed - see below)
-
-# Display Enhancement
-=                         # Show current line number
-n                         # Print with line numbers
+# File Operations
+w           # Write (save)
+q           # Quit
 ```
-
-## 🚀 The eed Tool
-
-### Why eed Over Edit/MultiEdit?
-
-- **Atomic Operations**: All-or-nothing transactions vs individual operations
-### Basic Usage
-```bash
-# Simple operations
-eed file.txt '5d'                    # Delete line 5
-eed file.txt '1,$s/old/new/g'        # Global replace
-
-# Multi-step operations (single parameter with ed command sequence)
-eed file.txt '3c
-new content
-eed file.js '1,$s/oldName/newName/g'
-```
-
-### Adding Imports
-```bash
-eed file.js '1i' 'import newModule from 'library';' '.'
-```
-
-### Global Replace
-```bash
-eed file.txt '1,$s/old pattern/new pattern/g'
-```
-
-## 🏆 Why eed is Superior
-
-eed myfile.js '10a' '// New comment' 'newFunction();' 'more code' '.'
-- **Auto backup/restore** - Never lose data
-- **Debug mode** - See exactly what failed
-
-### 5. Global Delete Patterns
-```bash
-# Remove all debug statements
-eed file.js 'g/console\.log/d'
-
-# Remove all comments
-eed file.js 'g/^[[:space:]]*\/\//d'
-
-# Remove empty lines
-eed file.txt 'g/^[[:space:]]*$/d'
-```
-
-### 6. Search and Navigate
-```bash
-# Find and then edit
-eed file.txt '/TODO/' 'c' 'DONE: Fixed the issue' '.'
-```
-
-### 7. Move and Copy Lines
-```bash
-# Move imports to top
-eed file.js 'g/^import/m0'
-
-# Copy function to end
-eed file.js '/function myFunc/,/^}/t$'
-```
-- **Perfect for AI** - Multi-argument API ideal for programmatic use
-
-**Start using eed today for reliable, atomic file editing\!**
-```
-
-## ⚡ CRITICAL: Correct Usage Patterns
-
-### ✅ RIGHT: Multi-line insertion
-```bash
-# Ed supports multi-line input until lone '.'
-eed file.txt '5a' 'line1' 'line2' 'line3' '.'
-
-# Add entire sections efficiently
-eed file.txt '10a' '## New Section' '' 'Content here' 'More content' '.'
-```
-
-### ❌ WRONG: One line per command
-```bash
-# DON'T do this - slow and error-prone
-eed file.txt '5a' 'line1' '.' '6a' 'line2' '.' '7a' 'line3' '.'
-```
-
-### ✅ RIGHT: Mixed operations (atomic)
-```bash
-# Combine different operations in one call
-eed file.txt '5d' '1,$s/old/new/g' '10a' 'new content' 'more lines' '.'
-```
-
-
-## 🧠 Think Before You Execute
-
-### Why eed Doesn't Need Undo
-Unlike interactive ed, eed operates in **atomic sessions**:
-- Each eed call is a complete transaction
-- Success = all changes applied permanently
-- Failure = complete rollback to original state
-- No partial/intermediate states exist
-
-### Best Practice: Mental Planning
-1. **Read** the file first to understand structure
-2. **Plan** your complete editing sequence mentally
-3. **Self-review** your ed commands for correctness
 
 ## Best Practices
 
-### Operation Ordering Rules
-
-**Golden Rule: Work backwards for line-changing operations**
-
-### Line Number Management Tips
-
-- Remember: "a" adds after line, "i" adds before line  
-- Count changes: Track how many lines added/removed
-- Use verification: "p" commands to check current state
-- Work in chunks: Break complex edits into verifiable steps
-
-### Error Prevention
-
-- Plan first: Think through the complete edit sequence
-- Test patterns: Try complex operations on small examples first  
-- Use debug mode: "eed --debug" when developing new patterns
-- Reverse order: Always work from high to low line numbers
-
-## ⚠️ CRITICAL: Shell Quoting Rules
-
-### The Root Cause of All Problems
-Most eed issues stem from ONE simple mistake: **using double quotes instead of single quotes**.
+### 1. Use Heredoc for Complex Operations
 
 ```bash
-# ❌ DANGEROUS - shell interprets metacharacters
-eed file.txt 'content with `date` and $HOME'
-# Result: date command executes, $HOME expands
-
-# ✅ SAFE - shell passes literally
-eed file.txt 'content with \ and \/c/Users/David.Wei'
-# Result: literal backticks and dollar signs preserved
-```
-
-### Golden Rule
-**Always use single quotes for eed content arguments\!**
-
-### When You Must Use Double Quotes
-Only use double quotes when you INTENTIONALLY want shell expansion:
-```bash
-# Intentional variable expansion
-eed file.txt 'path: $HOME/documents'  # OK if you want $HOME expanded
-```
-
-### Mixed Quoting Strategy
-```bash
-# Combine single quotes for safety with double quotes for ed commands
-eed file.txt '1a' 'content with `backticks` safely' '.'
-```
-
-## ⚠️ Important Gotchas
-
-### Shell Metacharacter Escaping
-When calling eed, be careful with shell special characters:
-
-```bash
-# ❌ DANGEROUS - shell interprets backticks
-eed file.txt 'text with `command` in it'
-
-# ✅ SAFE - use single quotes
-eed file.txt 'text with \ in it'
-
-# ❌ DANGEROUS - shell expands variables
-eed file.txt 'path: $HOME/file'
-
-# ✅ SAFE - escape or quote properly
-eed file.txt 'path: \/c/Users/David.Wei/file'
-```
-
-### Common Problematic Characters
-- Backticks: `command`
-- Variables: $HOME, $PATH
-- Command substitution: $(command)
-- Single quotes inside double quotes
-
-**Rule of thumb**: When in doubt, use single quotes around your content.
-4. **Execute** with confidence - eed handles success/failure
-
-### No Manual w/q Required
-eed automatically appends 'w' (write) and 'q' (quit) to every command sequence.
-Focus on your editing logic - eed handles the session management.
-### Here-Document Best Practice
-
-For complex multi-line edits, use here-document syntax for maximum clarity:
-
-```bash
-# Recommended: Here-document for complex operations  
 eed file.txt "$(cat <<'EOF'
-3c
-replacement content line 1
-replacement content line 2
-[DOT]
-5a
-new line to insert
-[DOT]
+/function/
+a
+// New comment added
+.
+s/oldName/newName/g
+w
+q
 EOF
 )"
 ```
 
-Note: Replace [DOT] with actual dot (.) in real usage.
-
-**Why here-documents are superior:**
-- No complex quote escaping needed
-- Visual clarity for multi-line content  
-- Easy to copy/paste and modify
-- Reliable across different shells
-
-### Nested Here-Document Pattern
-
-When writing documentation with here-document examples, use different delimiters:
+### 2. Always End with w and q
 
 ```bash
-# Outer delimiter: OUTER_EOF  
-eed docs.md "$(cat <<'OUTER_EOF'
-content with inner here-doc example
-OUTER_EOF
-)"
+# Correct - saves and exits
+eed file.txt '5d
+w
+q'
 
-# Inner delimiter: EOF (different from outer)
+# Wrong - changes not saved
+eed file.txt '5d
+q'
+```
+
+### 3. Work Backwards for Line Operations
+
+```bash
+# Good - work from end to beginning
+eed file.txt '10d
+5d
+1d
+w
+q'
+
+# Bad - line numbers shift unexpectedly
+eed file.txt '1d
+5d
+10d
+w
+q'
+```
+
+### 4. Use --debug for Development
+
+```bash
+eed --debug file.txt 'complex script here'
+# Shows temp file contents and ed execution details
+```
+
+## Shell Safety Rules
+
+### Critical: Quote Content Properly
+
+```bash
+# DANGEROUS - shell expands variables and commands
+eed file.txt "content with $HOME and `date`"
+
+# SAFE - single quotes preserve literally
+eed file.txt 'content with $HOME and `date`'
+```
+
+### Heredoc is Safest for Complex Content
+
+```bash
 eed file.txt "$(cat <<'EOF'
-3c
-new content
-[DOT]
+1a
+Content with 'quotes', $variables, and `backticks`
+All preserved literally inside heredoc
+.
+w
+q
 EOF
 )"
 ```
 
-**Critical rules:**
-- Each nesting level needs unique delimiters
-- Real dot terminates ed insert commands  
-- Let eed auto-handle w/q commands
-- Use --debug to verify parsing
+## Common Patterns
 
-### Pro Tips
-- Use Read tool first to understand file structure
-- Multi-line content goes between command and terminating dot
-- All operations in one eed call = atomic transaction
-- Use --debug when developing complex commands
-- Remember: line numbers, content lines, then dot to end input mode
-
-### Real-World Examples
+### Adding Import Statements
 ```bash
-# Adding code with backticks - SAFE
-eed script.js '1a' 'console.log(\);' '.'
-
-# Adding paths with dollars - SAFE
-eed config.txt '5a
-export PATH=$PATH:/usr/local/bin:/opt/homebrew/bin
-.'
-
-# Complex regex patterns - SAFE
-eed file.txt '1,\/old_\(.*\)_pattern/new_\1_replacement/g'
-
-# Multiple operations with mixed content - SAFE
-eed complex.js 'g/TODO/d' '1a' 'const API_URL = \;' '.'
+eed file.js "$(cat <<'EOF'
+1i
+import newModule from 'library';
+.
+w
+q
+EOF
+)"
 ```
 
-### Emergency Recovery
-If you accidentally used double quotes and got unexpected results:
+### Global Find and Replace
 ```bash
-# Check if backup exists
+eed file.txt "$(cat <<'EOF'
+1,$s/oldFunction/newFunction/g
+w
+q
+EOF
+)"
+```
+
+### Remove Debug Statements
+```bash
+eed file.js "$(cat <<'EOF'
+g/console\.log/d
+w
+q
+EOF
+)"
+```
+
+### Multi-Step Editing
+```bash
+eed file.txt "$(cat <<'EOF'
+/TODO/
+c
+DONE: Task completed
+.
+/FIXME/
+d
+w
+q
+EOF
+)"
+```
+
+## Error Recovery
+
+If something goes wrong:
+
+```bash
+# Check for backup
 ls -la yourfile.eed.bak
 
-# Manual recovery if needed
-cp yourfile.eed.bak yourfile.txt
+# Restore if needed
+mv yourfile.eed.bak yourfile.txt
+
+# Or use git
+git checkout HEAD -- yourfile.txt
 ```
 
-**Remember: eed creates automatic backups, but prevention is better than recovery\!**
+## Advanced Usage
+
+### Preview Mode vs Force Mode
+
+```bash
+# Preview mode (default) - safe for experimentation
+eed file.txt 'risky changes here'
+
+# Force mode - direct editing like traditional tools
+eed --force file.txt 'trusted changes here'
+```
+
+### Combining with Other Tools
+
+```bash
+# First examine the file
+cat file.txt | head -20
+
+# Then edit with eed
+eed file.txt "$(cat <<'EOF'
+10,15d
+w
+q
+EOF
+)"
+
+# Verify results
+git diff file.txt
+```
+
+## Why eed over Edit/MultiEdit Tools?
+
+- **Atomic Operations** - All changes succeed or all fail
+- **Built-in Safety** - Automatic backup and restore
+- **Preview Changes** - See before you commit
+- **Shell Integration** - Works with any text processing pipeline
+- **Reliable** - Based on proven ed editor
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Unexpected shell expansion** - Use single quotes or heredoc
+2. **Missing terminator** - Always end input mode with lone `.`
+3. **Line number confusion** - Work backwards, use preview mode
+4. **Backup files left behind** - Normal in preview mode, clean up manually
+
+### Getting Help
+
+Use `--debug` flag to see exactly what eed is doing:
+
+```bash
+eed --debug file.txt 'your commands here'
+```
+
+This shows the temporary command file contents and ed's actual output.
+
+---
+
+**Remember: eed's preview mode makes experimentation safe. Try complex edits with confidence\!**
+

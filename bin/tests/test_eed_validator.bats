@@ -242,3 +242,48 @@ w"
     [ "$output" = "view_only" ]
 }
 
+@test "dot trap detection: normal ed commands not affected" {
+    # Normal ed script with single dot should not trigger detection
+    run detect_dot_trap "3c
+new content
+.
+w
+q"
+    [ "$status" -eq 0 ]
+}
+
+@test "dot trap detection: simple script not flagged" {
+    # Short script with normal ed operations should pass
+    run detect_dot_trap "5d
+w
+q"
+    [ "$status" -eq 0 ]
+}
+
+@test "dot trap detection: suspicious pattern detected" {
+    # Complex script with multiple dots should trigger warning
+    local script="3c
+content line 1
+.
+5a
+more content
+.
+7c
+final content
+.
+w
+q"
+    run detect_dot_trap "$script"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"POTENTIAL_DOT_TRAP"* ]]
+}
+
+@test "dot trap guidance: provides helpful suggestions" {
+    # Should provide clear guidance about heredoc usage
+    local script="test script with multiple dots"
+    run bash -c 'source /home/davidwei/Projects/pkb/bin/lib/eed_validator.sh && suggest_dot_fix "$1"' _ "$script"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"consider using heredoc syntax"* ]]
+    [[ "$output" == *"[DOT] for content"* ]]
+}
+

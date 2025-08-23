@@ -11,7 +11,9 @@
       "Bash(grep:*)",
       "Bash(cat:*)",
       "Bash(bin/eed:*)",
-      "Bash(bats test:*)"
+      "Bash(bats test:*)",
+      "Bash(bats:*)",
+      "Bash(/home/davidwei/Projects/pkb/bin/eed:*)"
     ],
     "deny": []
   }

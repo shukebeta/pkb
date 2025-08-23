@@ -43,7 +43,7 @@ q"
     [[ "$output" == *"rm 'sample.txt.eed.bak'"* ]]
 
     # Original file should be unchanged
-    [[ "$(cat sample.txt)" == $'line1\nline2 \nline3' ]]
+    [[ "$(cat sample.txt)" == $'line1\nline2\nline3' ]]
 
     # Backup file should contain the changes
     [ -f sample.txt.eed.bak ]
@@ -117,7 +117,7 @@ q"
     [[ "$output" == *"Invalid ed command detected"* ]]
 
     # Original file should be unchanged
-    [[ "$(cat sample.txt)" == $'line1\nline2 \nline3' ]]
+    [[ "$(cat sample.txt)" == $'line1\nline2\nline3' ]]
 
     # Should not create backup file
     [ ! -f sample.txt.eed.bak ]
@@ -137,7 +137,7 @@ q"
     [[ "$output" == *"Edit command failed, restoring backup"* ]]
 
     # Original file should be restored (unchanged)
-    [[ "$(cat sample.txt)" == $'line1\nline2 \nline3' ]]
+    [[ "$(cat sample.txt)" == $'line1\nline2\nline3' ]]
 }
 
 @test "preview mode - successful apply workflow" {
@@ -151,14 +151,14 @@ q"
 
     # Should create backup with changes
     [ -f sample.txt.eed.bak ]
-    [[ "$(cat sample.txt.eed.bak)" == $'modified line1\nline2 \nline3' ]]
+    [[ "$(cat sample.txt.eed.bak)" == $'modified line1\nline2\nline3' ]]
 
     # Apply the changes using the provided command
     run mv sample.txt.eed.bak sample.txt
     [ "$status" -eq 0 ]
 
     # File should now have the changes
-    [[ "$(cat sample.txt)" == $'modified line1\nline2 \nline3' ]]
+    [[ "$(cat sample.txt)" == $'modified line1\nline2\nline3' ]]
 
     # Backup file should be gone
     [ ! -f sample.txt.eed.bak ]
@@ -181,7 +181,7 @@ q"
     [ "$status" -eq 0 ]
 
     # Original file should be unchanged
-    [[ "$(cat sample.txt)" == $'line1\nline2 \nline3' ]]
+    [[ "$(cat sample.txt)" == $'line1\nline2\nline3' ]]
 
     # Backup file should be gone
     [ ! -f sample.txt.eed.bak ]

@@ -102,3 +102,52 @@ classify_ed_script() {
     echo "view_only"
     return 0
 }
+
+# Detect potential dot trap in ed scripts
+# This detects patterns that might indicate a user intended to use heredoc
+# but the dots got interpreted as ed terminators instead
+detect_dot_trap() {
+    local script="$1"
+    local line_count=0
+    local dot_count=0
+    local suspicious_pattern=false
+    
+    # Count lines and standalone dots
+    while IFS= read -r line; do
+        ((line_count++))
+        if [[ "$line" = "." ]]; then
+            ((dot_count++))
+        fi
+        
+        # Look for patterns suggesting heredoc usage attempt
+        if [[ "$line" =~ ^[0-9]*[aciACI]$ ]] || [[ "$line" =~ ^w$ ]] || [[ "$line" =~ ^q$ ]]; then
+            suspicious_pattern=true
+        fi
+    done <<< "$script"
+    
+    # Heuristic: if we have multiple standalone dots and ed commands,
+    # this might be a case where heredoc wasn't used properly
+    if [ $dot_count -gt 1 ] && [ "$suspicious_pattern" = true ] && [ $line_count -gt 5 ]; then
+        echo "POTENTIAL_DOT_TRAP:$line_count:$dot_count"
+        return 1
+    fi
+    
+    return 0
+}
+
+# Provide helpful guidance about dot usage
+suggest_dot_fix() {
+    local script="$1"
+    
+    echo "⚠️  Detected multiple standalone dots in ed script" >&2
+    echo "   If you're using complex ed commands, consider using heredoc syntax:" >&2
+    echo "   eed file.txt \"\$(cat <<'EOF'" >&2
+    echo "   your ed commands here" >&2
+    echo "   use [DOT] for content, actual . for ed commands" >&2
+    echo "   EOF" >&2
+    echo "   )\"" >&2
+    echo "" >&2
+    echo "   Proceeding with current script..." >&2
+    
+    return 0
+}

@@ -8,6 +8,9 @@ setup() {
     TEST_DIR="$(mktemp -d)"
     cd "$TEST_DIR"
     export PATH="/home/davidwei/Projects/pkb/bin:$PATH"
+    
+    # Prevent logging during tests
+    export EED_TESTING=1
 
     # Create sample file for testing
     cat > sample.txt << 'EOF'

@@ -86,6 +86,23 @@ if [ -z "$ED_SCRIPT" ] || [ "$ED_SCRIPT" = "" ]; then
     exit 0
 fi
 
+# --- Dot Trap Detection and Guidance ---
+if ! detect_dot_trap "$ED_SCRIPT" >/dev/null; then
+    # Potential dot trap detected, provide guidance
+    suggest_dot_fix "$ED_SCRIPT"
+fi
+
+# --- Log Commands for Analysis ---
+log_ed_commands "$ED_SCRIPT"
+
+# --- Automatic Script Reordering for Line Number Safety ---
+# Get potentially reordered script to prevent line numbering conflicts
+REORDERED_SCRIPT=$(reorder_script_if_needed "$ED_SCRIPT")
+if [ $? -eq 1 ]; then
+    # Reordering was performed, use the reordered script
+    ED_SCRIPT="$REORDERED_SCRIPT"
+fi
+
 # Check if file exists, create if needed
 if [ ! -f "$FILE" ]; then
     echo "Creating new file: $FILE"

@@ -9,6 +9,9 @@ setup() {
 
     # Load validator functions
     source "/home/davidwei/Projects/pkb/bin/lib/eed_validator.sh"
+
+    # Prevent logging during tests
+    export EED_TESTING=1
 }
 
 teardown() {
@@ -161,6 +164,11 @@ EOF
     run classify_ed_script "xyz123"
     [ "$status" -eq 0 ]
     [ "$output" = "invalid_command" ]
+
+    # Test invalid multi-slash pattern (should not match search regex)
+    run classify_ed_script "/abc/def/ghi/"
+    [ "$status" -eq 0 ]
+    [ "$output" = "invalid_command" ]
 }
 
 @test "classifier: script with input mode parsing" {
@@ -240,5 +248,235 @@ w"
     run classify_ed_script "p "
     [ "$status" -eq 0 ]
     [ "$output" = "view_only" ]
+}
+
+@test "dot trap detection: normal ed commands not affected" {
+    # Normal ed script with single dot should not trigger detection
+    run detect_dot_trap "3c
+new content
+.
+w
+q"
+    [ "$status" -eq 0 ]
+}
+
+@test "dot trap detection: simple script not flagged" {
+    # Short script with normal ed operations should pass
+    run detect_dot_trap "5d
+w
+q"
+    [ "$status" -eq 0 ]
+}
+
+@test "dot trap detection: suspicious pattern detected" {
+    # Complex script with multiple dots should trigger warning
+    local script="3c
+content line 1
+.
+5a
+more content
+.
+7c
+final content
+.
+w
+q"
+    run detect_dot_trap "$script"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"POTENTIAL_DOT_TRAP"* ]]
+}
+
+@test "dot trap guidance: provides helpful suggestions" {
+    # Should provide clear guidance about heredoc usage
+    local script="test script with multiple dots"
+    run bash -c 'source /home/davidwei/Projects/pkb/bin/lib/eed_validator.sh && suggest_dot_fix "$1"' _ "$script"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"consider using heredoc syntax"* ]]
+    [[ "$output" == *"[DOT] for content"* ]]
+}
+
+# --- Tests for detect_line_order_issue ---
+
+@test "line order: ascending deletions should warn" {
+    local script="$(printf '10d\n20d\n30d')"
+    run detect_line_order_issue "$script"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Detected operations on ascending line numbers (10,20,30)"* ]]
+    [[ "$output" == *"Consider reordering: start from line (30,20,10)"* ]]
+}
+
+@test "line order: descending deletions should NOT warn" {
+    local script="$(printf '30d\n20d\n10d')"
+    run detect_line_order_issue "$script"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
+@test "line order: mixed operations with ascending modifying commands should warn" {
+    local script="$(printf '5p\n10d\n15p\n20c\ncontent\n.\n25p')"
+    run detect_line_order_issue "$script"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"ascending line numbers (10,20)"* ]]
+    [[ "$output" == *"reordering: start from line (20,10)"* ]]
+}
+
+@test "line order: view-only commands should NOT warn" {
+    local script="$(printf '10p\n20n\n30=')"
+    run detect_line_order_issue "$script"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
+@test "line order: single modifying operation should NOT warn" {
+    local script="$(printf '10d')"
+    run detect_line_order_issue "$script"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
+@test "line order: ascending range operations should warn" {
+    local script="$(printf '1,5d\n10,15s/old/new/')"
+    run detect_line_order_issue "$script"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"ascending line numbers (1,10)"* ]]
+    [[ "$output" == *"reordering: start from line (10,1)"* ]]
+}
+
+@test "line order: identical line numbers should NOT warn" {
+    local script="$(printf '10d\n10i\nnew line\n.')"
+    run detect_line_order_issue "$script"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
+@test "line order: unordered modifying commands should NOT warn" {
+    local script="$(printf '10d\n30d\n20d')"
+    run detect_line_order_issue "$script"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
+# --- Tests for automatic reordering functionality ---
+
+@test "auto reorder: ascending deletions get automatically reordered" {
+    local script="$(printf '2d\n4d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Signal that reordering was performed
+    # Verify the reordered output contains commands in correct order
+    [[ "$output" == *"4d"* ]]
+    [[ "$output" == *"2d"* ]]
+    [[ "$output" == *"w"* ]]
+    [[ "$output" == *"q"* ]]
+    # Check that 4d appears before 2d in the output
+    local output_lines=()
+    while IFS= read -r line; do output_lines+=("$line"); done <<< "$output"
+    local pos_4d=-1 pos_2d=-1
+    for i in "${!output_lines[@]}"; do
+        [[ "${output_lines[$i]}" == "4d" ]] && pos_4d=$i
+        [[ "${output_lines[$i]}" == "2d" ]] && pos_2d=$i
+    done
+    [ "$pos_4d" -lt "$pos_2d" ]  # 4d should come before 2d
+}
+
+@test "auto reorder: complex mixed operations (1d, 5a, 9c)" {
+    # Test ascending line numbers that need reordering: 1d, 5a, 9c → 9c, 5a, 1d
+    local script="$(printf '1d\n5a\nappended line\n.\n9c\nnew content\n.\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Reordering performed
+    # Should reorder modifying commands by line number descending: 9c, 5a, 1d
+    local output_lines=()
+    while IFS= read -r line; do output_lines+=("$line"); done <<< "$output"
+    local pos_9c=-1 pos_5a=-1 pos_1d=-1
+    for i in "${!output_lines[@]}"; do
+        [[ "${output_lines[$i]}" == "9c" ]] && pos_9c=$i
+        [[ "${output_lines[$i]}" == "5a" ]] && pos_5a=$i
+        [[ "${output_lines[$i]}" == "1d" ]] && pos_1d=$i
+    done
+    [ "$pos_9c" -lt "$pos_5a" ]  # 9c should come before 5a
+    [ "$pos_5a" -lt "$pos_1d" ]  # 5a should come before 1d
+
+    # Verify content preservation for input commands
+    [[ "$output" == *"appended line"* ]]
+    [[ "$output" == *"new content"* ]]
+}
+
+@test "auto reorder: no reordering needed for descending commands" {
+    local script="$(printf '4d\n2d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering needed
+    # Output should be identical to input
+    [ "$output" = "$script" ]
+}
+
+@test "auto reorder: preserve non-modifying commands in original positions" {
+    local script="$(printf '1p\n2d\n3p\n4d\n5p\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Reordering performed
+    # Should contain all original commands
+    [[ "$output" == *"1p"* ]]
+    [[ "$output" == *"3p"* ]]
+    [[ "$output" == *"5p"* ]]
+    [[ "$output" == *"4d"* ]]
+    [[ "$output" == *"2d"* ]]
+    [[ "$output" == *"w"* ]]
+    [[ "$output" == *"q"* ]]
+}
+
+@test "auto reorder: complex multiline operations - append and delete ranges" {
+    # Complex scenario: 15,20d (delete 6 lines), 8a (append 3 lines), 3,5d (delete 3 lines)
+    # Should reorder to: 15,20d, 8a, 3,5d to prevent line shifting issues
+    local script="$(printf '3,5d\n8a\nline 1 added\nline 2 added\nline 3 added\n.\n15,20d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Reordering performed
+
+    # Parse output to verify command order
+    local output_lines=()
+    while IFS= read -r line; do output_lines+=("$line"); done <<< "$output"
+
+    # Find positions of key commands
+    local pos_15_20d=-1 pos_8a=-1 pos_3_5d=-1
+    for i in "${!output_lines[@]}"; do
+        [[ "${output_lines[$i]}" == "15,20d" ]] && pos_15_20d=$i
+        [[ "${output_lines[$i]}" == "8a" ]] && pos_8a=$i
+        [[ "${output_lines[$i]}" == "3,5d" ]] && pos_3_5d=$i
+    done
+
+    # Verify correct ordering: higher line numbers first
+    [ "$pos_15_20d" -lt "$pos_8a" ]  # 15,20d before 8a
+    [ "$pos_8a" -lt "$pos_3_5d" ]    # 8a before 3,5d
+
+    # Verify multiline append content is preserved with command
+    [[ "$output" == *"8a"* ]]
+    [[ "$output" == *"line 1 added"* ]]
+    [[ "$output" == *"line 2 added"* ]]
+    [[ "$output" == *"line 3 added"* ]]
+}
+
+@test "auto reorder: mixed operations with range deletes and single inserts" {
+    # Scenario: 1,3d (delete range), 7c (change single), 10,15d (delete range), 20i (insert)
+    # Expected order: 20i, 10,15d, 7c, 1,3d
+    local script="$(printf '1,3d\n7c\nnew line 7\n.\n10,15d\n20i\ninserted at 20\n.\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Reordering performed
+
+    local output_lines=()
+    while IFS= read -r line; do output_lines+=("$line"); done <<< "$output"
+
+    local pos_20i=-1 pos_10_15d=-1 pos_7c=-1 pos_1_3d=-1
+    for i in "${!output_lines[@]}"; do
+        [[ "${output_lines[$i]}" == "20i" ]] && pos_20i=$i
+        [[ "${output_lines[$i]}" == "10,15d" ]] && pos_10_15d=$i
+        [[ "${output_lines[$i]}" == "7c" ]] && pos_7c=$i
+        [[ "${output_lines[$i]}" == "1,3d" ]] && pos_1_3d=$i
+    done
+
+    # Verify descending line number order
+    [ "$pos_20i" -lt "$pos_10_15d" ]
+    [ "$pos_10_15d" -lt "$pos_7c" ]
+    [ "$pos_7c" -lt "$pos_1_3d" ]
+
+    # Verify content preservation
+    [[ "$output" == *"new line 7"* ]]
+    [[ "$output" == *"inserted at 20"* ]]
 }
 

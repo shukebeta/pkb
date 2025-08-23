@@ -7,6 +7,9 @@ if [ "${EED_COMMON_LOADED:-}" = "1" ]; then
 fi
 EED_COMMON_LOADED=1
 
+# Ed command logging configuration
+EED_LOG_FILE="$HOME/.eed_command_log.txt"
+
 # Show usage information
 show_usage() {
     echo "Usage: eed [--debug] <file> <ed_script>"
@@ -39,4 +42,49 @@ show_usage() {
     echo '  q'
     echo '  EOF'
     echo '  )"'
+}
+
+# Log ed commands for analysis and debugging
+log_ed_commands() {
+    local script_content="$1"
+    
+    # Skip logging during tests
+    if [[ "${EED_TESTING:-}" == "1" ]]; then
+        return 0
+    fi
+    
+    local timestamp
+    timestamp=$(date --iso-8601=seconds)
+
+    local in_input_mode=false
+    while IFS= read -r line; do
+        # Trim whitespace for accurate parsing
+        line="${line#"${line%%[![:space:]]*}"}"
+        line="${line%"${line##*[![:space:]]}"}"
+
+        # --- Rule 1: Skip boilerplate ---
+        # If the line is exactly '.', 'w', 'q', or 'Q', ignore it.
+        if [[ "$line" == "." || "$line" == "w" || "$line" == "q" || "$line" == "Q" ]]; then
+            continue
+        fi
+
+        # --- Rule 2: Skip data lines (for a, c, i) ---
+        if [ "$in_input_mode" = true ]; then
+            if [[ "$line" == "." ]]; then
+                in_input_mode=false
+            fi
+            continue # Don't log the content being inserted
+        fi
+
+        # Check for commands that enter input mode *after* trying to log the command itself
+        if [[ "$line" =~ ^(\.|[0-9]+)?,?(\$|[0-9]+)?[aAcCiI]$ ]]; then
+            in_input_mode=true
+        fi
+
+        # --- Rule 3: Log the command if it's not empty and hasn't been skipped ---
+        if [ -n "$line" ]; then
+            # Log format: TIMESTAMP | COMMAND
+            echo "$timestamp | $line" >> "$EED_LOG_FILE"
+        fi
+    done <<< "$script_content"
 }

@@ -9,6 +9,9 @@ setup() {
     cd "$TEST_DIR"
     export PATH="/home/davidwei/Projects/pkb/bin:$PATH"
     EED_PATH="/home/davidwei/Projects/pkb/b"
+    
+    # Prevent logging during tests
+    export EED_TESTING=1
 }
 
 teardown() {

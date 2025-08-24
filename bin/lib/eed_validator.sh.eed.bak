@@ -6,6 +6,9 @@ if [ "${EED_VALIDATOR_LOADED:-}" = "1" ]; then
     return 0
 fi
 EED_VALIDATOR_LOADED=1
+# Source the shared regex patterns
+source "./eed_regex_patterns.sh"
+
 
 # Disable history expansion to prevent ! character escaping
 set +H

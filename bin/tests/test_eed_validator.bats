@@ -553,3 +553,113 @@ q"
     [[ "$output" != *'${\\!arr[@]}'* ]]
 }
 
+# Regex validation tests for complex pattern detection
+@test "regex validation: g/v pattern matching" {
+    # Should match (complex): g/v with modifying commands
+    [[ "g/pattern/d" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ "v/test/c" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ "g/func/s" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
+
+    # Should NOT match (safe): g/v with view commands
+    ! [[ "g/pattern/p" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ "g/test/n" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ "v/func/" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
+}
+
+@test "regex validation: non-numeric address matching" {
+    # Should match (complex): non-numeric with modifying commands
+    [[ "/pattern/d" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ ".d" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ "?search?c" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
+
+    # Should NOT match (safe): non-numeric with view commands
+    ! [[ "/pattern/p" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ ".p" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ "?search?" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
+}
+
+@test "regex validation: offset address matching" {
+    # Should match (complex): offset with modifying commands
+    [[ ".-5d" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ "$+3c" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ ".-2,.+2s" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
+
+    # Should NOT match (safe): offset with view commands
+    ! [[ ".-5p" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ "$-3,$p" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ ".+5" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
+}
+
+# Improved complex pattern detection tests
+@test "improved detection: g/pattern/p with simple deletes should allow reordering" {
+    local script="$(printf 'g/function/p\n1d\n5d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Reordering performed - g/pattern/p is safe
+    # Should be reordered to 5d, 1d
+    local output_lines=()
+    while IFS= read -r line; do output_lines+=("$line"); done <<< "$output"
+    local pos_5d=-1 pos_1d=-1
+    for i in "${!output_lines[@]}"; do
+        [[ "${output_lines[$i]}" == "5d" ]] && pos_5d=$i
+        [[ "${output_lines[$i]}" == "1d" ]] && pos_1d=$i
+    done
+    [ "$pos_5d" -lt "$pos_1d" ]
+}
+
+@test "improved detection: /pattern/p with simple deletes should allow reordering" {
+    local script="$(printf '/function/p\n1d\n5d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Reordering performed - /pattern/p is safe
+    # Should be reordered to 5d, 1d
+    local output_lines=()
+    while IFS= read -r line; do output_lines+=("$line"); done <<< "$output"
+    local pos_5d=-1 pos_1d=-1
+    for i in "${!output_lines[@]}"; do
+        [[ "${output_lines[$i]}" == "5d" ]] && pos_5d=$i
+        [[ "${output_lines[$i]}" == "1d" ]] && pos_1d=$i
+    done
+    [ "$pos_5d" -lt "$pos_1d" ]
+}
+
+@test "improved detection: offset address print with simple deletes should allow reordering" {
+    local script="$(printf '$-5,$p\n1d\n5d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 1 ]  # Reordering performed - $-5,$p is safe
+    # Should be reordered to 5d, 1d
+    local output_lines=()
+    while IFS= read -r line; do output_lines+=("$line"); done <<< "$output"
+    local pos_5d=-1 pos_1d=-1
+    for i in "${!output_lines[@]}"; do
+        [[ "${output_lines[$i]}" == "5d" ]] && pos_5d=$i
+        [[ "${output_lines[$i]}" == "1d" ]] && pos_1d=$i
+    done
+    [ "$pos_5d" -lt "$pos_1d" ]
+}
+
+@test "improved detection: g/pattern/d should still be detected as complex" {
+    local script="$(printf 'g/function/d\n1d\n5d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering due to complex pattern
+    [[ "$output" == *"g/function/d"* ]]
+    [[ "$output" == *"1d"* ]]
+    [[ "$output" == *"5d"* ]]
+}
+
+@test "improved detection: non-numeric address with delete should still be detected as complex" {
+    local script="$(printf '/pattern/d\n1d\n5d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering due to complex pattern
+    [[ "$output" == *"/pattern/d"* ]]
+    [[ "$output" == *"1d"* ]]
+    [[ "$output" == *"5d"* ]]
+}
+
+@test "improved detection: offset address with delete should still be detected as complex" {
+    local script="$(printf '.-5,.+5d\n1d\n5d\nw\nq')"
+    run reorder_script_if_needed "$script"
+    [ "$status" -eq 0 ]  # No reordering due to complex pattern
+    [[ "$output" == *".-5,.+5d"* ]]
+    [[ "$output" == *"1d"* ]]
+    [[ "$output" == *"5d"* ]]
+}
+

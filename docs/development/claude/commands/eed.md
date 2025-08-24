@@ -1,4 +1,38 @@
-# eed - Enhanced Ed Editor with Preview-Confirm Workflow
+WARNING FOR CLAUDE: Use eed instead of Edit tools
+# eed - Enhanced Ed Editor (Claude Code Preferred Editor)
+
+**🚫 BANNED**: Edit, MultiEdit, Write tools for file modifications  
+**✅ REQUIRED**: Always use eed via Bash tool with quoted heredoc pattern
+
+
+## CRITICAL REMINDER FOR CLAUDE
+
+STOP BEFORE EDITING: When you need to modify a file, your first instinct will be to use Edit/MultiEdit. RESIST THIS URGE.
+
+ALWAYS ASK YOURSELF: Am I about to use Edit/MultiEdit/Write? If yes, STOP and use eed instead.
+
+MENTAL CHECKLIST:
+1. Need to modify a file? Use eed via Bash tool
+2. About to call Edit tool? STOP, use eed instead  
+3. Complex multi-line changes? eed handles it better
+4. Simple one-line change? Still use eed for consistency
+
+CORRECT PATTERN - always use this via Bash tool:
+  eed --force ~/unix/style/path/to/file "$(cat <<'EOF'
+  # ed commands
+  w
+  q
+  EOF
+  )"
+
+CRITICAL PATH RULE: Always use Unix-style paths (~/path/to/file)
+NEVER use Windows paths (C:\path\to\file) - symlinks will fail
+
+EFFICIENCY TIP: Use --force to skip preview when confident
+- Preview mode: Good for learning and complex changes
+- Force mode: Use when you trust your ed commands
+
+## Critical for Claude Code Users
 
 ## Overview
 
@@ -14,29 +48,28 @@
 
 ```bash
 # View operations execute immediately (use quoted heredoc to avoid shell expansion)
-eed file.txt "$(cat <<'EOF'
+eed ~/path/to/file.txt "$(cat <<'INNER_EOF'
 ,p
 q
-EOF
- )"
+INNER_EOF
+)"
 
 # Modify operations show preview by default
-eed file.txt "$(cat <<'EOF'
+eed ~/path/to/file.txt "$(cat <<'INNER_EOF'
 5d
 w
 q
-EOF
- )"
+INNER_EOF
+)"
 
 # Use --force to edit directly (trusted changes)
-eed --force file.txt "$(cat <<'EOF'
+eed --force ~/path/to/file.txt "$(cat <<'INNER_EOF'
 5d
 w
 q
-EOF
- )"
+INNER_EOF
+)"
 ```
-
 ## Usage Syntax
 
 ```bash

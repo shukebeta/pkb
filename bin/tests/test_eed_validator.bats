@@ -8,6 +8,8 @@ setup() {
     cd "$TEST_DIR"
 
     # Load validator functions
+    # Load shared regex patterns
+    source "/home/davidwei/Projects/pkb/bin/lib/eed_regex_patterns.sh"
     source "/home/davidwei/Projects/pkb/bin/lib/eed_validator.sh"
 
     # Prevent logging during tests
@@ -548,46 +550,46 @@ q"
     local script="$(set +H; printf '3a\necho \"Array indices: \${!arr[@]}\"\n.\nw\nq')"
     run reorder_script_if_needed "$script"
     [ "$status" -eq 0 ]  # No reordering needed for single command
-    # Verify the exclamation mark is preserved (not escaped as \!)
+    # Verify the exclamation mark is preserved (not escaped as !)
     [[ "$output" == *'${!arr[@]}'* ]]
-    [[ "$output" != *'${\\!arr[@]}'* ]]
+    [[ "$output" != *'${\!arr[@]}'* ]]
 }
 
 # Regex validation tests for complex pattern detection
 @test "regex validation: g/v pattern matching" {
     # Should match (complex): g/v with modifying commands
-    [[ "g/pattern/d" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
-    [[ "v/test/c" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
-    [[ "g/func/s" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ "g/pattern/d" =~ $EED_REGEX_GV_MODIFYING ]]
+    [[ "v/test/c" =~ $EED_REGEX_GV_MODIFYING ]]
+    [[ "g/func/s" =~ $EED_REGEX_GV_MODIFYING ]]
 
     # Should NOT match (safe): g/v with view commands
-    ! [[ "g/pattern/p" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
-    ! [[ "g/test/n" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
-    ! [[ "v/func/" =~ ^[[:space:]]*[gvGV]/.*[/][dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ "g/pattern/p" =~ $EED_REGEX_GV_MODIFYING ]]
+    ! [[ "g/test/n" =~ $EED_REGEX_GV_MODIFYING ]]
+    ! [[ "v/func/" =~ $EED_REGEX_GV_MODIFYING ]]
 }
 
 @test "regex validation: non-numeric address matching" {
     # Should match (complex): non-numeric with modifying commands
-    [[ "/pattern/d" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
-    [[ ".d" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
-    [[ "?search?c" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ "/pattern/d" =~ $EED_REGEX_NON_NUMERIC_MODIFYING ]]
+    [[ ".d" =~ $EED_REGEX_NON_NUMERIC_MODIFYING ]]
+    [[ "?search?c" =~ $EED_REGEX_NON_NUMERIC_MODIFYING ]]
 
     # Should NOT match (safe): non-numeric with view commands
-    ! [[ "/pattern/p" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
-    ! [[ ".p" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
-    ! [[ "?search?" =~ ^[[:space:]]*[\./\?].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ "/pattern/p" =~ $EED_REGEX_NON_NUMERIC_MODIFYING ]]
+    ! [[ ".p" =~ $EED_REGEX_NON_NUMERIC_MODIFYING ]]
+    ! [[ "?search?" =~ $EED_REGEX_NON_NUMERIC_MODIFYING ]]
 }
 
 @test "regex validation: offset address matching" {
     # Should match (complex): offset with modifying commands
-    [[ ".-5d" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
-    [[ "$+3c" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
-    [[ ".-2,.+2s" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    [[ ".-5d" =~ $EED_REGEX_OFFSET_MODIFYING ]]
+    [[ "$+3c" =~ $EED_REGEX_OFFSET_MODIFYING ]]
+    [[ ".-2,.+2s" =~ $EED_REGEX_OFFSET_MODIFYING ]]
 
     # Should NOT match (safe): offset with view commands
-    ! [[ ".-5p" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
-    ! [[ "$-3,$p" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
-    ! [[ ".+5" =~ ^[[:space:]]*[\.\$][+-][0-9].*[dDcCbBiIaAsSjJmMtT]$ ]]
+    ! [[ ".-5p" =~ $EED_REGEX_OFFSET_MODIFYING ]]
+    ! [[ "$-3,$p" =~ $EED_REGEX_OFFSET_MODIFYING ]]
+    ! [[ ".+5" =~ $EED_REGEX_OFFSET_MODIFYING ]]
 }
 
 # Improved complex pattern detection tests

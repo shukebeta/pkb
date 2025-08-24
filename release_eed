@@ -1,0 +1,8 @@
+cp -v bin/eed ~/bin
+cp -v bin/lib/eed* ~/bin/lib
+cp -v bin/tests/*eed* ~/bin/tests
+cp -v bin/eed ../eed
+cp -v bin/lib/eed* ../eed/lib
+cp -v bin/tests/*eed* ../eed/tests
+chmod  +x ~/bin/eed
+cp docs/development/claude/commands/eed.md ~/.claude/commands

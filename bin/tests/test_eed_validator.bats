@@ -108,7 +108,7 @@ teardown() {
     [ "$status" -eq 0 ]
     [ "$output" = "has_modifying" ]
 
-    run classify_ed_script "1,\$s/old/new/g"
+    run classify_ed_script "1,$s/old/new/g"
     [ "$status" -eq 0 ]
     [ "$output" = "has_modifying" ]
 
@@ -226,11 +226,11 @@ w"
 # Integration tests for edge cases
 
 @test "classifier edge case: dollar sign in ranges" {
-    run classify_ed_script "1,\$s/old/new/g"
+    run classify_ed_script "1,$s/old/new/g"
     [ "$status" -eq 0 ]
     [ "$output" = "has_modifying" ]
 
-    run classify_ed_script "5,\$p"
+    run classify_ed_script "5,$p"
     [ "$status" -eq 0 ]
     [ "$output" = "view_only" ]
 }
@@ -294,7 +294,7 @@ q"
     run bash -c 'source /home/davidwei/Projects/pkb/bin/lib/eed_validator.sh && suggest_dot_fix "$1"' _ "$script"
     [ "$status" -eq 0 ]
     [[ "$output" == *"consider using heredoc syntax"* ]]
-    [[ "$output" == *"[DOT] for content"* ]]
+    [[ "$output" == *". for content"* ]]
 }
 
 # --- Tests for detect_line_order_issue ---
@@ -547,12 +547,12 @@ q"
 @test "exclamation mark preservation: bash array syntax should not be escaped" {
     # Test that exclamation marks in bash array syntax are preserved correctly
     set +H  # Ensure history expansion is disabled in test
-    local script="$(set +H; printf '3a\necho \"Array indices: \${!arr[@]}\"\n.\nw\nq')"
+    local script="$(set +H; printf '3a\necho \"Array indices: ${!arr[@]}\"\n.\nw\nq')"
     run reorder_script_if_needed "$script"
     [ "$status" -eq 0 ]  # No reordering needed for single command
     # Verify the exclamation mark is preserved (not escaped as !)
     [[ "$output" == *'${!arr[@]}'* ]]
-    [[ "$output" != *'${\!arr[@]}'* ]]
+    [[ "$output" != *'${!arr[@]}'* ]]
 }
 
 # Regex validation tests for complex pattern detection
@@ -665,3 +665,33 @@ q"
     [[ "$output" == *"5d"* ]]
 }
 
+
+# Git add reminder tests
+@test "git add reminder: --force mode shows git add suggestion" {
+    local test_file="$TEST_DIR/reminder_test.txt"
+    echo "original content" > "$test_file"
+    
+    run /home/davidwei/Projects/pkb/bin/eed --force "$test_file" "1c
+new content
+.
+w
+q"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Successfully edited"* ]]
+    [[ "$output" == *"Recommended: git add"* ]]
+    [[ "$output" == *"reminder_test.txt"* ]]
+}
+
+@test "git add reminder: preview mode does not show git add suggestion" {
+    local test_file="$TEST_DIR/preview_test.txt"
+    echo "original content" > "$test_file"
+    
+    run /home/davidwei/Projects/pkb/bin/eed "$test_file" "1c
+new content
+.
+w
+q"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"Edits applied to a temporary backup"* ]]
+    [[ "$output" != *"Recommended: git add"* ]]
+}

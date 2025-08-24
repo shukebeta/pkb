@@ -274,7 +274,7 @@ if [ "$SCRIPT_TYPE" = "has_modifying" ]; then
         echo ""
 
         # Generate and print the diff
-        diff -u "$FILE" "$BACKUP_FILE" || true
+        diff -u --color=auto "$FILE" "$BACKUP_FILE" || true
 
         echo ""
         echo "To apply these changes, run:"

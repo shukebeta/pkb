@@ -46,7 +46,7 @@ eed [--debug] [--force] [--disable-auto-reorder] <file> <ed_script>
 **Options:**
 - `--debug` - Show detailed execution info, preserve temp files
 - `--force` - Skip preview mode, edit file directly
-- `--disable-auto-reorder` - Disable automatic script reordering (useful when edits depend on a fixed sequence of line numbers)
+- `--disable-auto-reorder` - Disable automatic script reordering and complex pattern detection (expert mode)
 
 ## The Preview-Confirm Workflow
 Example (canonical quoted heredoc form):
@@ -134,6 +134,29 @@ w           # Write (save)
 q           # Quit
 ```
 
+## Automatic Safety Features
+
+eed provides intelligent safety features that work behind the scenes:
+
+### Smart Line Number Reordering
+
+Automatically reorders operations to prevent line number conflicts:
+- `1d; 5d; 10d` becomes `10d; 5d; 1d`
+- Preserves multi-line input commands as atomic units
+- Warns about complex patterns that can't be safely reordered
+
+### Complex Pattern Detection
+
+Detects potentially dangerous patterns and disables auto-reordering:
+- Global commands (`g/pattern/d`, `v/pattern/p`)
+- Overlapping address ranges (`3,5d` + `5a`)
+- Non-numeric addresses (`./pattern/`, `$-5`)
+- Move/transfer operations (`1,5m10`)
+
+### Shell Safety
+
+Prevents history expansion issues with exclamation marks in bash syntax.
+
 ## Best Practices
 
 ### Shell safety & quoting (preferred)
@@ -167,20 +190,24 @@ EOF
  )"
 ```
 
-### Work backwards for line-number edits
+### Line Number Safety (Automatic)
 
-When deleting multiple line numbers, start from the end to avoid shifting.
+eed automatically reorders line-number operations to prevent conflicts - write them in any order:
 
 ```bash
+# These are equivalent - eed handles the ordering
 eed file.txt "$(cat <<'EOF'
-10d
-5d
 1d
+5d
+10d
 w
 q
 EOF
  )"
+# Becomes: 10d, 5d, 1d automatically
 ```
+
+Complex patterns (overlapping ranges, g/v blocks) are detected and warned about for safety.
 
 ### Use --debug for development
 
@@ -285,9 +312,11 @@ ls -la yourfile.eed.bak
 # Restore if needed
 mv yourfile.eed.bak yourfile.txt
 
-# Or use git
-git checkout HEAD -- yourfile.txt
+# Or revert just the current edit (keeps previous successful changes)
+git checkout -- yourfile.txt
 ```
+
+**Best practice**: After each successful edit, stage your progress with `git add yourfile.txt` to create safe restore points.
 
 ## Advanced Usage
 
@@ -322,10 +351,11 @@ git diff file.txt
 ## Why eed over Edit/MultiEdit Tools?
 
 - **Atomic Operations** - All changes succeed or all fail
-- **Built-in Safety** - Automatic backup and restore
+- **Intelligent Safety** - Auto-reordering + complex pattern detection
+- **Built-in Backup** - Automatic backup and restore
 - **Preview Changes** - See before you commit
 - **Shell Integration** - Works with any text processing pipeline
-- **Reliable** - Based on proven ed editor
+- **Reliable** - Based on proven ed editor with modern enhancements
 
 ## Troubleshooting
 
@@ -333,7 +363,7 @@ git diff file.txt
 
 1. **Unexpected shell expansion** - Use single quotes or heredoc
 2. **Missing terminator** - Always end input mode with lone `.`
-3. **Line number confusion** - Work backwards, use preview mode
+3. **Complex pattern warnings** - eed detected unsafe patterns, review or use `--disable-auto-reorder`
 4. **Backup files left behind** - Normal in preview mode, clean up manually
 
 ### Getting Help

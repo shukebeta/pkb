@@ -27,15 +27,15 @@ EOF
 CRITICAL PATH RULE: Always use Unix-style paths (~/path/to/file)
 NEVER use Windows paths (C:\path\to\file) - symlinks will fail
 
-**PATH CONVERSION EXAMPLES**:
-- ❌ `C:\Users\David.Wei\davidwei\file.txt`
-- ✅ `~/davidwei/file.txt`
-- ❌ `C:/Users/David.Wei/davidwei/docs/file.md`
-- ✅ `~/davidwei/docs/file.md`
-- ❌ `.\docs\relative\file.txt`
-- ✅ `docs/relative/file.txt`
+PATH CONVERSION EXAMPLES:
+- WRONG: `C:\Users\David.Wei\davidwei\file.txt`
+- RIGHT: `~/davidwei/file.txt`
+- WRONG: `C:/Users/David.Wei/davidwei/docs/file.md`
+- RIGHT: `~/davidwei/docs/file.md`
+- WRONG: `.\docs\relative\file.txt`
+- RIGHT: `docs/relative/file.txt`
 
-**MEMORY AID**: Think "tilde home" (~) not "C drive"
+MEMORY AID: Think "tilde home" (~) not "C drive"
 
 EFFICIENCY TIP: Use --force to skip preview when confident
 - Preview mode: Good for learning and complex changes
@@ -407,10 +407,20 @@ git checkout -- yourfile.txt
 
 ```bash
 # Preview mode (default) - safe for experimentation
-eed file.txt 'risky changes here'
+eed file.txt "$(cat <<'EOF'
+1,$s/old/new/g
+w
+q
+EOF
+)"
 
 # Force mode - direct editing like traditional tools
-eed --force file.txt 'trusted changes here'
+eed --force file.txt "$(cat <<'EOF'
+1,$s/old/new/g
+w
+q
+EOF
+)"
 ```
 
 ### Combining with Other Tools
@@ -533,6 +543,25 @@ eed file.txt "$(cat <<'EOF'
 q
 EOF
 )"
+```
+
+### File permissions for AI editors
+
+Ensure the target file is writable before attempting modifications. Minimal checks and fixes:
+
+```bash
+ls -l ~/path/to/file
+[ -w ~/path/to/file ] || chmod u+w ~/path/to/file
+# If ownership differs:
+# sudo chown "$(whoami)" ~/path/to/file
+```
+
+Recommended workflow: edit on a feature branch, then stage and commit the change:
+```bash
+git checkout -b fix/eed
+# run eed...
+git add path/to/file
+git commit -m "fix: update file via eed"
 ```
 
 ## Troubleshooting

@@ -4,26 +4,27 @@ Always use the eed tool instead of Edit, MultiEdit, or Write tools for file modi
 
 ## Instructions:
 
-**For complete eed documentation, read:** https://github.com/shukebeta/eed/blob/master/docs/claude/eed-comprehensive-guide.md
+**For complete eed documentation, read:** https://github.com/shukebeta/eed/blob/master/docs/eed-comprehensive-guide.md
 
 
 1. **Stop before using Edit/MultiEdit tools** - Always ask yourself: "Am I about to use Edit/MultiEdit/Write?" If yes, use eed instead.
 
 2. **Use eed via Bash tool with quoted heredoc pattern**:
    ```bash
-   eed --force ~/unix/style/path/to/file "$(cat <<'EOF'
-   # ed commands here
-   w
-   q
-   EOF
-   )"
+eed --force /unix/style/path/to/file - <<'EOF'
+# ed commands here
+w
+q
+EOF
    ```
 
-3. **Always use Unix-style paths** (~/path/to/file) - NEVER use Windows paths (C:\path\to\file)
+3. **Always use Unix-style paths** (~/path/to/file) - NEVER use Windows paths (C:\path\to\file). Always use forward slashes (/), as backslashes will break shell commands.
 
 4. **Always end ed commands with w and q** to save changes:
    - `w` - write (save) the file
    - `q` - quit editor
+
+5. **Forgiving stdin mode (new)** - If you pipe ed commands but omit the `-` argument, `eed` will read stdin, proceed normally (validation, preview/force), and — on *successful completion* — print a friendly, non-blaming, educational tip. For scripts and CI, prefer the explicit `-` to avoid ambiguity.
 
 ## Ed Command Reference:
 
@@ -45,62 +46,57 @@ Always use the eed tool instead of Edit, MultiEdit, or Write tools for file modi
 
 ### Force Mode (Recommended):
 ```bash
-eed --force file.txt "$(cat <<'EOF'
+eed --force file.txt - <<'EOF'
 5d
 w
 q
 EOF
-)"
 ```
 
 ### Preview Mode (Default):
 Shows changes first, requires manual confirmation
 ```bash
-eed file.txt "$(cat <<'EOF'
+eed file.txt - <<'EOF'
 5d
 w
 q
 EOF
-)"
 ```
 
 ## Common Patterns:
 
 ### Add Import Statement:
 ```bash
-eed --force file.js "$(cat <<'EOF'
+eed --force file.js - <<'EOF'
 1i
 import newModule from 'library';
 .
 w
 q
 EOF
-)"
 ```
 
 ### Replace Text Globally:
 ```bash
-eed --force file.txt "$(cat <<'EOF'
+eed --force file.txt - <<'EOF'
 1,$s/oldFunction/newFunction/g
 w
 q
 EOF
-)"
 ```
 
 ### Delete Lines with Pattern:
 ```bash
-eed --force file.js "$(cat <<'EOF'
+eed --force file.js - <<'EOF'
 g/console\.log/d
 w
 q
 EOF
-)"
 ```
 
 ### Multi-Step Editing:
 ```bash
-eed --force file.txt "$(cat <<'EOF'
+eed --force file.txt - <<'EOF'
 /TODO/
 c
 DONE: Task completed
@@ -109,7 +105,6 @@ DONE: Task completed
 w
 q
 EOF
-)"
 ```
 
 ## Error Handling:
@@ -117,7 +112,7 @@ EOF
 - If eed command fails, check syntax of ed commands
 - Always verify file exists before editing
 - Use `--debug` flag to troubleshoot issues
-- Backup files automatically created as `file.eed.bak`
+- Backup / preview files are written as `file.eed.preview` (in preview mode)
 
 ## Important:
 
@@ -125,4 +120,54 @@ EOF
 - **Force mode**: Recommended for direct execution
 - **Unix paths**: Always use forward slashes
 - **Save explicitly**: Never forget `w` and `q`
+- **Avoid nested heredocs**: Nested heredocs are fragile and prone to parsing errors. Prefer multiple sequential `eed` edits or write a temporary ed script and feed it via stdin with `-`.
 - **Atomic operations**: All changes succeed or all fail
+
+
+## Multiple Input Methods:
+
+### Method 1: Heredoc (Complex Edits - Recommended)
+Use different delimiter to avoid conflicts:
+```bash
+eed --force file.txt - <<'END_EDIT'
+5d
+1i
+new content
+
+## Multiple Input Methods:
+
+### Method 1: Heredoc (Complex Edits - Recommended)
+```bash
+eed --force file.txt - <<'END_EDIT'
+5d
+1i
+new content
+.
+w
+q
+END_EDIT
+```
+
+### Method 2: Printf (Medium Complexity)  
+```bash
+printf '5d\nw\nq\n' | eed --force file.txt -
+```
+
+### Method 3: Echo + Single Quotes (Simple Edits)
+```bash
+echo '5d
+w
+q' | eed --force file.txt -
+```
+
+**Choose the right method:**
+- **Simple edits (1-3 commands)**: echo + single quotes
+- **Medium complexity**: printf for precise format control
+- **Complex edits**: heredoc with different delimiter
+
+**⚠️ Nested Heredoc Warning:**  
+Avoid using the same delimiter (like EOF) inside your content. Use different delimiters like END_EDIT, SCRIPT_END, etc.
+
+**💡 Ed Dot Problem:**  
+When documenting ed examples with standalone dots, the classic solution is to use placeholders like [DOT] and replace them programmatically.
+FINAL_END < /dev/null

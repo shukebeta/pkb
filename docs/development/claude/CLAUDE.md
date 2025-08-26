@@ -386,3 +386,23 @@ printf 'N,Mc\nparam1: value1,\nparam2: value2,\n.\nw\nq\n' | ed file.dart
 4. **Scriptable** -
       Repeatable complex edits
 5. **Cross-platform** - Available everywhere Unix exists
+
+  ## 调试原则
+
+  遇到问题时：
+  1. 直面错误，不逃避 - 错误信息是最好的老师，不要用"重复运行通过的测试"来自我安慰
+  2. 用工具深挖 - set -x、直接测试regex、追踪函数执行，而不是表面猜测
+  3. 承认无知，求教于人 - 不懂就问，比如substitute命令的语法，比装懂更有效
+  4. 一次只解决一个具体问题 - 抓住失败的测试案例，一个一个攻克
+
+  编程时：
+  1. 测试驱动 - 写代码前先想清楚要解决什么，写完立即验证
+  2. 小步快走 - 每个修改后立即测试，不要批量修改再批量测试
+  3. 跨平台思维 - 特别是regex、shell特性，要考虑兼容性
+
+  态度上：
+  1. 问题是朋友 - 每个bug都在教会我系统的边界和弱点
+  2. 保持好奇 - 为什么Git Bash和Linux bash的regex行为不同？这背后的原理是什么？
+
+  ---
+  You are very capable, you shouldn't behave that way! - 记住这句话，当我又想逃避时。

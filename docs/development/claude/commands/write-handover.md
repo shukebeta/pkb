@@ -1,86 +1,109 @@
 # Write Session Handover Document
 
-Create a short but comprehensive handover document for the current session.
+Create a comprehensive handover document for the current development session.
 
 ## Instructions:
 
-1. Generate timestamp-based filename: `handover/handover-YYYYMMDD-HHMMSS.txt`
-2. Create handover document with session information
-3. Save to project's handover directory
+1. Create handover directory and generate timestamp:
+   ```bash
+   mkdir -p handover
+   timestamp=$(date +%Y%m%d-%H%M%S)
+   ```
 
-## Document Structure:
+2. Create handover document:
+   ```bash
+   cat > handover/handover-$timestamp.txt << 'HANDOVER_EOF'
+   # Session Handover - $(date +%Y-%m-%d %H:%M)
+   # Project: [Brief session context/main topic]
 
-```
-# HappyNotes Session Handover
-# Date: YYYY-MM-DD HH:MM
-# Context: [Brief session context/main topic]
+   ## ISSUE BEING WORKED ON
 
-## The issue you are working on
+   ## COMPLETED TASKS
 
-## COMPLETED TASKS/ATTEMPTS
+   ### [Category]
+   - **[Task Name] - [STATUS]**
+     - Problem: [Description]
+     - Solution: [What was implemented]
+     - Files: [Modified files]
 
-### [Category 1]
-1. **[Task Name] - [STATUS]**
-   - Problem: [Description of issue/requirement]
-   - Root Cause: [Technical root cause if bug fix]
-   - Solution: [What was implemented]
+   ## TODO LIST
 
-### [Category 2]
-- **[Task Name]**: [Brief description of what was completed]
-- **[Another Task]**: [Brief description]
+   ### Incomplete Tasks
+   - [ ] [Task]: [Description]
 
-## TODO LIST with completed and incomplete Tasks
+   ### Completed Tasks
+   - [x] [Task]: [Description]
 
-## TECHNICAL IMPLEMENTATION
+   ## TECHNICAL IMPLEMENTATION
 
-### Key Files Modified
-- `path/to/file1`: [What was changed]
-- `path/to/another_file`: [What was changed]
+   ### Key Files Modified
+   - `path/to/file`: [Changes made]
 
-### Critical Methods Added/Modified
-```code
-// Brief code examples if relevant
-@override Future<SomeType> methodName()
-```
+   ### Critical Methods/Functions
+   ```
+   // Code examples if relevant
+   methodName(): returnType
+   ```
 
-## ARCHITECTURE INSIGHTS
+   ## ARCHITECTURE INSIGHTS
 
-### [Insight Category]
-- [Key architectural decision or pattern discovered]
-- [Important technical detail for future reference]
+   - [Key architectural decision or pattern]
+   - [Important technical detail for future reference]
 
-## CURRENT STATUS
+   ## CURRENT STATUS
 
-### ✅ FULLY FUNCTIONAL
-- [Feature/component]: [Status description]
-- [Another feature]: [Status description]
+   ### Fully Functional
+   - [Feature/component]: [Status description]
 
-### 🔧 TECHNICAL DEBT (Optional Future)
-- [Potential improvement areas]
+   ### Technical Debt (Future Improvements)
+   - [Potential improvement areas]
 
-## NEXT SESSION PRIORITIES
+   ## NEXT SESSION PRIORITIES
 
-**[Priority Level]**: [Description of what should be tackled next]
+   1. [High Priority]: [Description]
+   2. [Medium Priority]: [Description]
 
-**Potential enhancements**:
-1. [Enhancement 1]
-2. [Enhancement 2]
+   ---
+   Session Status: [COMPLETE/IN-PROGRESS] - [One-line summary]
+   HANDOVER_EOF
+   ```
 
----
-**Session Status**: [COMPLETE/IN-PROGRESS] - [One-line summary]
-```
+3. Confirm file creation:
+   ```bash
+   ls -la handover/handover-$timestamp.txt
+   echo "Handover document created: handover/handover-$timestamp.txt"
+   ```
 
 ## Content Guidelines:
 
-- Focus on actionable information for the next session
-- Include specific file paths and method names
-- Highlight architectural decisions and patterns
-- Note any unresolved issues or technical debt
-- Keep descriptions concise but informative
-- Use technical terminology appropriate for developers
+- **Focus on actionability**: What does next session need to know?
+- **Include specifics**: File paths, method names, line numbers
+- **Document decisions**: Why certain approaches were chosen
+- **Note blockers**: Unresolved issues or dependencies
+- **Keep concise**: Informative but scannable
+- **Use developer terminology**: Technical accuracy over simplification
+
+## Document Sections:
+
+- **ISSUE**: Current problem/feature being worked on
+- **COMPLETED**: What was finished this session
+- **TODO**: Outstanding work with clear next steps
+- **TECHNICAL**: Code changes and implementation details
+- **ARCHITECTURE**: Design decisions and patterns
+- **STATUS**: Current functionality state
+- **PRIORITIES**: What to tackle next session
+
+## Error Handling:
+
+- If `handover/` directory creation fails, create in current directory
+- If timestamp generation fails, use manual format: `handover-YYYYMMDD-HHMMSS.txt`
+- Always confirm file was written successfully
+- Include fallback for manual template completion
 
 ## Important:
-- Always save to `handover/` directory in project root
+
+- Save to `handover/` directory in project root
 - Use timestamp format: YYYYMMDD-HHMMSS
-- Focus on what future sessions need to know
-- Include both completed work and next steps
+- Write file immediately without asking for confirmation
+- Focus on information continuity between sessions
+- Include both completed work and clear next steps

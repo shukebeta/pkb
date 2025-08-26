@@ -30,15 +30,15 @@ Display all requirements with their status and summaries.
    Summary: Full theme system with user preferences
    Linked PR: #234 (merged)
 
-2025-01-25-1400-export-reports  
+2025-01-25-1400-export-reports
    Status: Implemented | 22 questions answered
    Summary: PDF/CSV export with filtering
-   
+
 ⚠️ INCOMPLETE:
 2025-01-24-1100-notification-system
    Status: Paused at Detail phase (2/8) | Last: 2 days ago
    Summary: Email/push notifications for events
-   
+
 📈 Statistics:
 - Total: 4 requirements
 - Complete: 2 (13 avg questions)

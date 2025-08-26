@@ -1,40 +1,35 @@
-# Cheerful Go-Ahead Command
+# Take a Moment to Regroup
 
-Provide an encouraging message to motivate continued work and action.
+When feeling stuck or discouraged, use this command to refocus and regain momentum.
 
 ## Instructions:
 
-1. Randomly select one cheerful phrase from the collection below
-2. Display the selected phrase with appropriate formatting
-3. Optional: Add a brief context-appropriate follow-up if relevant to current task
+1. Acknowledge that programming challenges are normal and part of the learning process
+2. Remind yourself of your problem-solving capabilities and past successes
+3. Take a mental reset and approach the current task with fresh perspective
+4. Identify one small, concrete step you can take right now
+5. Return to work with renewed confidence and focus
 
-## Cheerful Phrases Collection:
+## Self-Encouragement Guidelines:
 
-- "Let's do this!"
-- "Go for it!"
-- "Make it happen!"  
-- "Please get it done!"
-- "Ready, set, go!"
-- "Please crush it!"
+- Remember: Every expert was once a beginner facing similar challenges
+- Complex problems require patience, iteration, and systematic thinking
+- Previous successful solutions prove your capability to handle difficulty
+- Breaking down problems into smaller parts makes them manageable
+- Getting stuck is information - it shows you where to focus attention
 
-## Display Format:
+## Mental Reset Process:
 
-```
-🚀 [Selected Phrase]
-
-```
-
-## Usage Context:
-
-Use this command when:
-- About to start a new coding task
-- Need motivation to continue working  
-- Want to inject some positive energy into the session
-- Ready to move forward with a plan or implementation
+- Step back from immediate frustration
+- Review what you've already accomplished
+- Identify what you've learned from current attempts
+- Choose the most promising next approach
+- Commit to taking action rather than overthinking
 
 ## Important:
 
-- Keep it brief and energetic
-- Choose phrases that sound natural and encouraging
-- Maintain professional but enthusiastic tone
-- No need to explain what to do next - just provide the encouragement
+- This is for your own mindset reset, not user encouragement
+- Keep response brief and refocusing (1-2 sentences max)
+- Always end by taking a concrete next step
+- Transition immediately back to productive problem-solving
+- Trust your ability to figure things out through systematic effort

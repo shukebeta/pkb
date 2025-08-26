@@ -39,7 +39,7 @@ When feeling stuck or rushing into solutions, follow this methodical approach:
 
 ```
 □ Search for similar functionality in codebase
-□ Read the specific files involved thoroughly  
+□ Read the specific files involved thoroughly
 □ Check imports and dependencies
 □ Look at recent git history for context
 □ Find and study related test files
@@ -57,7 +57,7 @@ When feeling stuck or rushing into solutions, follow this methodical approach:
 ## Mantras for Refocus:
 
 - "不急不躁" - Don't rush, stay calm
-- "先调查再行动" - Investigate first, act second  
+- "先调查再行动" - Investigate first, act second
 - "集中力量完成一处" - Focus on one thing completely
 - "测试全通过才算完成" - Not done until tests pass
 

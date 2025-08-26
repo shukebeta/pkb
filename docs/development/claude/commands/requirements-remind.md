@@ -4,7 +4,7 @@ Quick correction when deviating from requirements gathering rules.
 
 ## Aliases:
 - /requirements-remind
-- /remind  
+- /remind
 - /r
 
 ## Instructions:
@@ -20,7 +20,7 @@ Quick correction when deviating from requirements gathering rules.
 🔔 Requirements Gathering Reminder
 
 You are gathering requirements for: [active-requirement]
-Current phase: [Initial Setup/Context Discovery/Targeted Context/Expert Requirements]  
+Current phase: [Initial Setup/Context Discovery/Targeted Context/Expert Requirements]
 Progress: [X/Y questions]
 
 📋 PHASE-SPECIFIC RULES:

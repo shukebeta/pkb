@@ -13,7 +13,7 @@ Finalize the current requirement gathering session.
    ```
    ⚠️ Ending requirement: [name]
    Current phase: [phase] ([X/Y] complete)
-   
+
    What would you like to do?
    1. Generate spec with current information
    2. Mark as incomplete for later

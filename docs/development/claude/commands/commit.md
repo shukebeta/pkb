@@ -32,6 +32,12 @@ Create a meaningful commit message and commit current changes to the repository.
 
 5. Run `git status` to confirm commit succeeded
 
+6. (Optional) Push to remote if needed:
+   - Check upstream: `git rev-parse --abbrev-ref @{upstream} 2>/dev/null`
+   - If no upstream: `git push -u origin $(git branch --show-current)`
+   - If has upstream: `git push`
+   - Confirm: `git status -s`
+
 ## Commit Message Guidelines:
 
 - **Types**: feat, fix, refactor, test, docs, style, chore

@@ -1,31 +1,70 @@
 # Read Latest Handover Document
 
-Display the most recent handover document to understand previous session context.
+Read the most recent handover document and immediately begin working on priority tasks.
 
 ## Instructions:
 
-1. List recent 3 files in the `handover/` directory
-2. Find the most recent handover document (highest timestamp)
-3. Read it thoroughly and understand what need to be done
-4. Use one paragraph to summary what you get from the handover document.
-5. Start working on the first thing that needs to do
-4. If no handover files exist, show "No handover documents found"
-4. If no to-do task in the handover at all, show "No todos found"
+1. Find and list recent handover documents:
+   ```bash
+   ls -t handover/handover-*.txt 2>/dev/null | head -3
+   ```
 
-## Display Format:
+2. Read the most recent handover document:
+   ```bash
+   latest_handover=$(ls -t handover/handover-*.txt 2>/dev/null | head -1)
+   if [ -n "$latest_handover" ]; then
+     echo "Reading: $latest_handover"
+     cat "$latest_handover"
+   fi
+   ```
+
+3. Analyze handover content and provide summary:
+   - Understand current issue being worked on
+   - Review completed tasks and current status
+   - Identify next priority actions
+   - Note any blockers or technical debt
+
+4. Begin work immediately:
+   - Start with the first item in "NEXT SESSION PRIORITIES"
+   - If no priorities listed, continue with incomplete TODO items
+   - Create new todo list based on handover content
+   - Take action without asking for confirmation
+
+## Summary Format:
 
 ```
-📋 Latest Handover: handover-YYYYMMDD-HHMMSS.txt
-⏱️  Date: YYYY-MM-DD HH:MM
+Latest Handover: handover-YYYYMMDD-HHMMSS.txt
+Date: YYYY-MM-DD HH:MM
 
----
-📂 3 Recent Handovers:
+Recent Handovers:
 - handover-YYYYMMDD-HHMMSS.txt (latest)
 - handover-YYYYMMDD-HHMMSS.txt
 - handover-YYYYMMDD-HHMMSS.txt
+
+Summary: [One paragraph describing current state and what needs to be done]
+
+Starting work on: [First priority task from handover]
 ```
 
+## Action Guidelines:
+
+- **Immediate execution**: Begin work without asking permission
+- **Priority-driven**: Follow handover priorities or TODO order
+- **Context awareness**: Use technical details from handover
+- **Continuity**: Pick up exactly where previous session left off
+- **Todo integration**: Create new todo list based on handover content
+
+## Error Handling:
+
+- If no handover directory exists: "No handover directory found - starting fresh session"
+- If no handover files found: "No handover documents found - ready for new tasks"
+- If handover file is empty/corrupt: "Handover file invalid - proceeding with current context"
+- If no clear next actions: "No specific priorities found - ready for instructions"
+
 ## Important:
-- Read complete content of the latest handover and understand what needs to be done next
-- 
-- This is view-only (no modifications to handover files)
+
+- This is a read-and-execute command, not view-only
+- Always start working immediately after reading
+- Use handover technical details to inform approach
+- Maintain session continuity and context
+- Never modify existing handover files

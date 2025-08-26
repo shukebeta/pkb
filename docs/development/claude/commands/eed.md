@@ -4,7 +4,7 @@ Always use the eed tool instead of Edit, MultiEdit, or Write tools for file modi
 
 ## Instructions:
 
-**📚 For complete eed documentation, read:** https://github.com/shukebeta/pkb/blob/master/docs/development/claude/eed-comprehensive-guide.md
+**For complete eed documentation, read:** https://github.com/shukebeta/eed/blob/master/docs/claude/eed-comprehensive-guide.md
 
 
 1. **Stop before using Edit/MultiEdit tools** - Always ask yourself: "Am I about to use Edit/MultiEdit/Write?" If yes, use eed instead.
@@ -71,3 +71,58 @@ EOF
 eed --force file.js "$(cat <<'EOF'
 1i
 import newModule from 'library';
+.
+w
+q
+EOF
+)"
+```
+
+### Replace Text Globally:
+```bash
+eed --force file.txt "$(cat <<'EOF'
+1,$s/oldFunction/newFunction/g
+w
+q
+EOF
+)"
+```
+
+### Delete Lines with Pattern:
+```bash
+eed --force file.js "$(cat <<'EOF'
+g/console\.log/d
+w
+q
+EOF
+)"
+```
+
+### Multi-Step Editing:
+```bash
+eed --force file.txt "$(cat <<'EOF'
+/TODO/
+c
+DONE: Task completed
+.
+5d
+w
+q
+EOF
+)"
+```
+
+## Error Handling:
+
+- If eed command fails, check syntax of ed commands
+- Always verify file exists before editing
+- Use `--debug` flag to troubleshoot issues
+- Backup files automatically created as `file.eed.bak`
+
+## Important:
+
+- **Mandatory tool**: Use eed for ALL file modifications
+- **Force mode**: Recommended for direct execution
+- **Unix paths**: Always use forward slashes
+- **Save explicitly**: Never forget `w` and `q`
+- **Atomic operations**: All changes succeed or all fail

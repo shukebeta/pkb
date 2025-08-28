@@ -24,7 +24,7 @@ EOF
    - `w` - write (save) the file
    - `q` - quit editor
 
-5. **Forgiving stdin mode (new)** - If you pipe ed commands but omit the `-` argument, `eed` will read stdin, proceed normally (validation, preview/force), and — on *successful completion* — print a friendly, non-blaming, educational tip. For scripts and CI, prefer the explicit `-` to avoid ambiguity.
+5. **Forgiving stdin mode** - If you pipe ed commands but omit the `-` argument, `eed` will read stdin, proceed normally (validation, preview/force), and — on *successful completion* — print a friendly, non-blaming, educational tip. For scripts and CI, prefer the explicit `-` to avoid ambiguity.
 
 ## Ed Command Reference:
 
@@ -129,24 +129,13 @@ EOF
 ### Method 1: Heredoc (Complex Edits - Recommended)
 Use different delimiter to avoid conflicts:
 ```bash
-eed --force file.txt - <<'END_EDIT'
-5d
-1i
-new content
-
-## Multiple Input Methods:
-
-### Method 1: Heredoc (Complex Edits - Recommended)
-```bash
-eed --force file.txt - <<'END_EDIT'
+eed --force file.txt - <<'EOF'
 5d
 1i
 new content
 .
-w
-q
-END_EDIT
-```
+wq
+EOF
 
 ### Method 2: Printf (Medium Complexity)  
 ```bash
@@ -166,8 +155,20 @@ q' | eed --force file.txt -
 - **Complex edits**: heredoc with different delimiter
 
 **⚠️ Nested Heredoc Warning:**  
-Avoid using the same delimiter (like EOF) inside your content. Use different delimiters like END_EDIT, SCRIPT_END, etc.
+Avoid using the same delimiter (like EOF) inside your content. Use different delimiters like EOF, SCRIPT_END, etc.
 
 **💡 Ed Dot Problem:**  
 When documenting ed examples with standalone dots, the classic solution is to use placeholders like [DOT] and replace them programmatically.
 FINAL_END < /dev/null
+Suggested fixes:
+- Use unique delimiters for nested heredocs (e.g. `INNER` / `OUTER`).
+- Or write the ed script to a temporary file and feed it via stdin (`-`) to avoid nesting entirely.
+
+## Important:
+
+- **Mandatory tool**: Use eed for ALL file modifications
+- **Force mode**: Recommended for direct execution
+- **Unix paths**: Always use forward slashes
+- **Save explicitly**: Never forget `w` and `q`
+- **Avoid nested heredocs**: Nested heredocs are fragile and prone to parsing errors. Prefer multiple sequential `eed` edits or write a temporary ed script and feed it via stdin with `-`.
+- **Atomic operations**: All changes succeed or all fail

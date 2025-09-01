@@ -76,7 +76,7 @@ export default defineConfig({
         
         footer: {
           message: 'Released under the MIT License.',
-          copyright: "Copyright © 2024 Shuke's Scribbles"
+          copyright: "Copyright © 2025 Shuke's Scribbles"
         },
         
       }
@@ -143,7 +143,7 @@ export default defineConfig({
         
         footer: {
           message: '基于 MIT 许可证发布。',
-          copyright: 'Copyright © 2024 舒克贝塔的烂笔头'
+          copyright: 'Copyright © 2025 舒克贝塔的烂笔头'
         },
         
         
@@ -225,7 +225,7 @@ export default defineConfig({
     hostname: 'https://pkb.shukebeta.com',
     title: "shukebeta's scribbles",
     description: 'Personal tech notes and development discoveries',
-    copyright: "Copyright © 2024 Shuke's Scribbles"
+    copyright: "Copyright © 2025 Shuke's Scribbles"
   },
 
   // Sitemap

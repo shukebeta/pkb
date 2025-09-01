@@ -152,7 +152,7 @@ export default defineConfig({
   
   // Theme configuration
   themeConfig: {
-    logo: '/logo.png',
+    logo: '/logo.svg',
     
     editLink: {
       pattern: 'https://github.com/shukebeta/pkb/edit/master/docs/:path'
@@ -166,9 +166,9 @@ export default defineConfig({
     ['meta', { name: 'og:type', content: 'website' }],
     ['meta', { name: 'og:locale', content: 'en' }],
     ['meta', { name: 'og:site_name', content: 'Personal Knowledge Base' }],
-    ['meta', { name: 'og:image', content: 'https://pkb.shukebeta.com/logo.png' }],
+    ['meta', { name: 'og:image', content: 'https://pkb.shukebeta.com/logo.svg' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    ['meta', { name: 'twitter:image', content: 'https://pkb.shukebeta.com/logo.png' }],
+    ['meta', { name: 'twitter:image', content: 'https://pkb.shukebeta.com/logo.svg' }],
     // Google Analytics (replace with your tracking ID)
     ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID' }],
     ['script', {}, "window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', 'GA_TRACKING_ID');"]

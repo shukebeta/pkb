@@ -6,7 +6,7 @@ hero:
   text: "Technical Guides & Solutions"
   tagline: "Curated collection of development tutorials, troubleshooting guides, and technical insights"
   image:
-    src: /logo.png
+    src: /logo.svg
     alt: PKB Logo
   actions:
     - theme: brand

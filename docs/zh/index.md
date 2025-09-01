@@ -6,7 +6,7 @@ hero:
   text: "技术指南与解决方案"
   tagline: "精选的开发教程、故障排除指南和技术见解集合"
   image:
-    src: /logo.png
+    src: /logo.svg
     alt: PKB Logo
   actions:
     - theme: brand

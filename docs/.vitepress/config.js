@@ -10,8 +10,8 @@ export default defineConfig({
   // Last updated timestamp
   lastUpdated: true,
   
-  // Ignore dead links during build (for now)
-  ignoreDeadLinks: true,
+  // Ignore dead links during build (temporarily disabled for now)
+  // ignoreDeadLinks: true,
   
   // Locales configuration for bilingual support
   locales: {
@@ -96,14 +96,24 @@ export default defineConfig({
             {
               text: '分步指南',
               items: [
-                { text: 'Seq 日志的 CLI 开发', link: '/zh/guides/cli-development-with-seq' }
+                { text: 'Seq 日志的 CLI 开发', link: '/zh/guides/cli-development-with-seq' },
+                { text: 'VirtIO 剪贴板共享', link: '/zh/guides/virt-manager-clipboard-sharing' },
+                { text: 'GitHub PR 差异技巧', link: '/zh/guides/github-pr-diff-trick' },
+                { text: 'Git 智能添加别名', link: '/zh/guides/git-smartadd-alias' },
+                { text: 'Docker 自动安装', link: '/zh/guides/docker-auto-install' },
+                { text: 'Docker 数据恢复', link: '/zh/guides/docker-data-restore' },
+                { text: 'Node.js 路径模拟 DI', link: '/zh/guides/nodejs-path-mocking-dependency-injection' },
+                { text: 'Cloudflare DNS 更新', link: '/zh/guides/cloudflare-dns-update' },
+                { text: 'Claude 记忆连续性', link: '/zh/guides/claude-memory-continuity-prompts' }
               ]
             }
           ],
           '/zh/troubleshooting/': [
             {
               text: '问题解决',
-              items: []
+              items: [
+                { text: '禁用 Rider WinForms 设计器', link: '/zh/troubleshooting/disable-rider-winforms-designer' }
+              ]
             }
           ],
           '/zh/development/': [

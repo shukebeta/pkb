@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://shukebeta.github.io/pkb/sitemap.xml
+Sitemap: https://pkb.shukebeta.com/sitemap.xml

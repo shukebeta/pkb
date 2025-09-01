@@ -166,9 +166,9 @@ export default defineConfig({
     ['meta', { name: 'og:type', content: 'website' }],
     ['meta', { name: 'og:locale', content: 'en' }],
     ['meta', { name: 'og:site_name', content: 'Personal Knowledge Base' }],
-    ['meta', { name: 'og:image', content: 'https://shukebeta.github.io/pkb/logo.png' }],
+    ['meta', { name: 'og:image', content: 'https://pkb.shukebeta.com/logo.png' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    ['meta', { name: 'twitter:image', content: 'https://shukebeta.github.io/pkb/logo.png' }],
+    ['meta', { name: 'twitter:image', content: 'https://pkb.shukebeta.com/logo.png' }],
     // Google Analytics (replace with your tracking ID)
     ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID' }],
     ['script', {}, "window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', 'GA_TRACKING_ID');"]
@@ -176,7 +176,7 @@ export default defineConfig({
 
   // RSS Feed
   rss: {
-    hostname: 'https://shukebeta.github.io/pkb',
+    hostname: 'https://pkb.shukebeta.com',
     title: 'Personal Knowledge Base',
     description: 'Technical guides and troubleshooting documentation',
     copyright: 'Copyright © 2024 Personal Knowledge Base'
@@ -184,6 +184,6 @@ export default defineConfig({
 
   // Sitemap
   sitemap: {
-    hostname: 'https://shukebeta.github.io/pkb'
+    hostname: 'https://pkb.shukebeta.com'
   }
 })

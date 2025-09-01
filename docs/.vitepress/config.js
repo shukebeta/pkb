@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { createRssFileEN } from './genFeed.js'
 
 export default defineConfig({
   title: "shukebeta's scribbles",
@@ -231,5 +232,8 @@ export default defineConfig({
   // Sitemap
   sitemap: {
     hostname: 'https://pkb.shukebeta.com'
-  }
+  },
+
+  // Build hooks
+  buildEnd: createRssFileEN
 })

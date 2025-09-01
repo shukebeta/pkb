@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-  name: "个人知识库"
-  text: "技术指南与解决方案"
-  tagline: "精选的开发教程、故障排除指南和技术见解集合"
+  name: "舒克贝塔的烂笔头"
+  text: "随手技术笔记"
+  tagline: "个人开发心得、问题记录和技术发现的随手整理"
   image:
     src: /logo.svg
     alt: PKB Logo

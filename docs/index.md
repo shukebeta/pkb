@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-  name: "Personal Knowledge Base"
-  text: "Technical Guides & Solutions"
-  tagline: "Curated collection of development tutorials, troubleshooting guides, and technical insights"
+  name: "Shuke's Scribbles"
+  text: "Random Tech Notes"
+  tagline: "Personal collection of development tips, troubleshooting notes, and technical discoveries"
   image:
     src: /logo.svg
     alt: PKB Logo

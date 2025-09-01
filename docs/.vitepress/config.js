@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'Personal Knowledge Base',
-  description: 'Technical guides and troubleshooting documentation',
+  title: "Shuke's Scribbles",
+  description: 'Personal tech notes and development discoveries',
   
   // Clean URLs without .html extension
   cleanUrls: true,
@@ -18,8 +18,8 @@ export default defineConfig({
     root: {
       label: 'English',
       lang: 'en-US',
-      title: 'Personal Knowledge Base',
-      description: 'Technical guides and troubleshooting documentation',
+      title: "Shuke's Scribbles",
+      description: 'Personal tech notes and development discoveries',
       
       themeConfig: {
         nav: [
@@ -76,7 +76,7 @@ export default defineConfig({
         
         footer: {
           message: 'Released under the MIT License.',
-          copyright: 'Copyright © 2024 Personal Knowledge Base'
+          copyright: "Copyright © 2024 Shuke's Scribbles"
         },
         
       }
@@ -85,8 +85,8 @@ export default defineConfig({
     zh: {
       label: '中文',
       lang: 'zh-CN',
-      title: '个人知识库',
-      description: '技术指南和问题解决文档',
+      title: '舒克贝塔的烂笔头',
+      description: '个人技术笔记和开发发现',
       
       themeConfig: {
         nav: [
@@ -143,7 +143,7 @@ export default defineConfig({
         
         footer: {
           message: '基于 MIT 许可证发布。',
-          copyright: 'Copyright © 2024 个人知识库'
+          copyright: 'Copyright © 2024 舒克贝塔的烂笔头'
         },
         
         
@@ -211,7 +211,7 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#646cff' }],
     ['meta', { name: 'og:type', content: 'website' }],
     ['meta', { name: 'og:locale', content: 'en' }],
-    ['meta', { name: 'og:site_name', content: 'Personal Knowledge Base' }],
+    ['meta', { name: 'og:site_name', content: "Shuke's Scribbles" }],
     ['meta', { name: 'og:image', content: 'https://pkb.shukebeta.com/logo.svg' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:image', content: 'https://pkb.shukebeta.com/logo.svg' }],
@@ -223,9 +223,9 @@ export default defineConfig({
   // RSS Feed
   rss: {
     hostname: 'https://pkb.shukebeta.com',
-    title: 'Personal Knowledge Base',
-    description: 'Technical guides and troubleshooting documentation',
-    copyright: 'Copyright © 2024 Personal Knowledge Base'
+    title: "Shuke's Scribbles",
+    description: 'Personal tech notes and development discoveries',
+    copyright: "Copyright © 2024 Shuke's Scribbles"
   },
 
   // Sitemap

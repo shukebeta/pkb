@@ -25,7 +25,14 @@ export default defineConfig({
         nav: [
           { text: 'Guides', link: '/guides/' },
           { text: 'Troubleshooting', link: '/troubleshooting/' },
-          { text: 'Development', link: '/development/' }
+          { text: 'Development', link: '/development/' },
+          { 
+            text: 'More', 
+            items: [
+              { text: '中文版 🇨🇳', link: '/zh/' },
+              { text: 'RSS Feed', link: '/feed.rss' }
+            ]
+          }
         ],
         
         sidebar: {
@@ -85,7 +92,14 @@ export default defineConfig({
         nav: [
           { text: '指南', link: '/zh/guides/' },
           { text: '故障排除', link: '/zh/troubleshooting/' },
-          { text: '开发', link: '/zh/development/' }
+          { text: '开发', link: '/zh/development/' },
+          { 
+            text: '更多', 
+            items: [
+              { text: 'English 🇺🇸', link: '/' },
+              { text: 'RSS 订阅', link: '/feed.rss' }
+            ]
+          }
         ],
         
         sidebar: {

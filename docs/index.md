@@ -15,6 +15,9 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/shukebeta/pkb
+    - theme: alt
+      text: RSS Feed
+      link: /feed.rss
 
 features:
   - icon: 📖

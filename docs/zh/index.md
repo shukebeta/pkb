@@ -15,6 +15,9 @@ hero:
     - theme: alt
       text: GitHub
       link: https://github.com/shukebeta/pkb
+    - theme: alt
+      text: RSS 订阅
+      link: /feed.rss
 
 features:
   - icon: 📖

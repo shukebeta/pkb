@@ -1,0 +1,102 @@
+/**
+ * Customize default theme styling by overriding CSS variables:
+ * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
+ */
+
+/**
+ * Colors
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-c-brand-1: #646cff;
+  --vp-c-brand-2: #747bff;
+  --vp-c-brand-3: #535bf2;
+}
+
+/**
+ * Component: Giscus Comments
+ * -------------------------------------------------------------------------- */
+
+.giscus {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+/**
+ * Component: Custom "Edit this page on GitHub"
+ * -------------------------------------------------------------------------- */
+
+.edit-link-button {
+  display: inline-block;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  padding: 0 20px;
+  line-height: 38px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-bg);
+  margin-bottom: 16px;
+  transition: border-color 0.25s, color 0.25s;
+}
+
+.edit-link-button:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+/**
+ * Component: Home
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(
+    120deg,
+    #bd34fe 30%,
+    #41d1ff
+  );
+
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    #bd34fe 50%,
+    #47caff 50%
+  );
+  --vp-home-hero-image-filter: blur(44px);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(56px);
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(68px);
+  }
+}
+
+/**
+ * Component: Custom Badge  
+ * -------------------------------------------------------------------------- */
+
+.info.custom-block {
+  border-color: var(--vp-c-brand-1);
+}
+
+.info.custom-block .custom-block-title {
+  color: var(--vp-c-brand-1);
+}
+
+/**
+ * Mobile responsive
+ * -------------------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .giscus {
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+}

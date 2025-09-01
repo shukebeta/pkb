@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: "Shuke's Scribbles",
+  title: "shukebeta's scribbles",
   description: 'Personal tech notes and development discoveries',
   
   // Clean URLs without .html extension
@@ -18,7 +18,7 @@ export default defineConfig({
     root: {
       label: 'English',
       lang: 'en-US',
-      title: "Shuke's Scribbles",
+      title: "shukebeta's scribbles",
       description: 'Personal tech notes and development discoveries',
       
       themeConfig: {
@@ -211,7 +211,7 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#646cff' }],
     ['meta', { name: 'og:type', content: 'website' }],
     ['meta', { name: 'og:locale', content: 'en' }],
-    ['meta', { name: 'og:site_name', content: "Shuke's Scribbles" }],
+    ['meta', { name: 'og:site_name', content: "shukebeta's scribbles" }],
     ['meta', { name: 'og:image', content: 'https://pkb.shukebeta.com/logo.svg' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:image', content: 'https://pkb.shukebeta.com/logo.svg' }],
@@ -223,7 +223,7 @@ export default defineConfig({
   // RSS Feed
   rss: {
     hostname: 'https://pkb.shukebeta.com',
-    title: "Shuke's Scribbles",
+    title: "shukebeta's scribbles",
     description: 'Personal tech notes and development discoveries',
     copyright: "Copyright © 2024 Shuke's Scribbles"
   },

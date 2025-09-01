@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: "Shuke's Scribbles"
+  name: "shukebeta's scribbles"
   text: "Random Tech Notes"
   tagline: "Personal collection of development tips, troubleshooting notes, and technical discoveries"
   image:

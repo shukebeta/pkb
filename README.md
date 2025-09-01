@@ -23,6 +23,7 @@ docs/
 - [Node.js Path Mocking Dependency Injection](docs/guides/nodejs-path-mocking-dependency-injection.md) - Cross-platform testing with path.win32/posix
 - [Claude Memory Continuity Prompts](docs/guides/claude-memory-continuity-prompts.md) - Maintain conversation memory across Claude windows
 - [Git Smart Add Alias](docs/guides/git-smartadd-alias.md) - Remove trailing whitespace and stage files
+- [VirtIO Clipboard Sharing](docs/guides/virt-manager-clipboard-sharing.md) - Linux host ↔ Windows VM clipboard integration
 
 ### Troubleshooting
 - [Disable Rider WinForms Designer](docs/troubleshooting/disable-rider-winforms-designer.md) - Fix build-blocking designer processes

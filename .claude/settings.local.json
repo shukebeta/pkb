@@ -21,7 +21,8 @@
       "Bash(set -H)",
       "Bash(shopt:*)",
       "Bash(sed:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

@@ -1,18 +1,20 @@
 import DefaultTheme from 'vitepress/theme'
 import { h } from 'vue'
-import Giscus from '@giscus/vue'
+// import Giscus from '@giscus/vue'
 import './custom.css'
 
 export default {
   extends: DefaultTheme,
+  // Temporarily disable comments until Discussions is configured
+  /*
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       'doc-after': () => h(Giscus, {
         id: "comments",
         repo: "shukebeta/pkb",
-        repoId: "R_kgDOL-aaFg", // Replace with your repo ID
-        category: "Announcements",
-        categoryId: "DIC_kwDOL-aaFs4CizrE", // Replace with your category ID  
+        repoId: "YOUR_REPO_ID_HERE", // 从 giscus.app 获取
+        category: "General",
+        categoryId: "YOUR_CATEGORY_ID_HERE", // 从 giscus.app 获取
         mapping: "pathname",
         strict: "0",
         reactionsEnabled: "1",
@@ -24,4 +26,5 @@ export default {
       })
     })
   }
+  */
 }

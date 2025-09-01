@@ -1,6 +1,6 @@
-# Knowledge Base Repository Instructions
+# shukebeta's scribbles - Repository Instructions
 
-This is a personal knowledge base repo where I ask questions and capture valuable insights from our conversations.
+This is the source repository for [pkb.shukebeta.com](https://pkb.shukebeta.com) - a bilingual tech notes site.
 
 ## Communication Style Preferences
 
@@ -16,7 +16,8 @@ When creating documentation/guides:
 - Include practical examples with code blocks
 - Keep it brief but complete
 - Focus on "how-to" rather than "why"
-- **ALWAYS update README.md index after creating new guides/articles**
+- **Content is auto-indexed** - no need to manually update README.md
+- **Both languages welcome** - place Chinese content in `docs/zh/`
 
 ## File Organization
 
@@ -31,7 +32,19 @@ When creating documentation/guides:
 - One-sentence explanations maximum
 - No unnecessary pleasantries or confirmations
 
-## Git Workflow Practices
+## Publication Workflow
 
-- After updating the README.md file, proactively commit the changes you made and push them to remote
+### Site Auto-Updates
+- **Site deploys automatically** on git push to master
+- **Search index updates** automatically - no manual intervention needed
+- **Navigation updates** automatically based on file structure
+
+### Content Workflow
+1. Create/edit content in appropriate directory
+2. For bilingual content, create both `docs/path/file.md` and `docs/zh/path/file.md` 
+3. Commit and push - site updates automatically
+4. **No need to update README.md** - it stays as pure repository documentation
+
+### Technical Notes
 - 总是在子shell里工作以避免不小心破坏当前路径的值
+- VitePress handles all indexing and navigation automatically

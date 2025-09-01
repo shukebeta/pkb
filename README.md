@@ -1,33 +1,49 @@
-# Personal Knowledge Base
+# shukebeta's scribbles
 
-## Directory Structure
+> Random tech notes and development discoveries
 
-```
-docs/
-├── development/          # Development tools and practices
-│   └── jetbrains/       # JetBrains IDE specific guides
-├── troubleshooting/     # Problem-solution documentation
-├── guides/              # Step-by-step tutorials
-├── references/          # Quick reference materials
-└── projects/            # Project-specific documentation
-```
+## 🌐 Live Site
+**Visit: [https://pkb.shukebeta.com](https://pkb.shukebeta.com)**
 
-## Quick Index
+- **English**: Technical guides and random notes
+- **中文**: 技术指南和随手记录 
+- **RSS**: [Subscribe to updates](https://pkb.shukebeta.com/feed.rss)
 
-### Guides
-- [CLI Development with Seq](docs/guides/cli-development-with-seq.md) - Command-line development and debugging with Seq logging
-- [Docker Auto Installation](docs/guides/docker-auto-install.md) - Non-interactive Docker setup for Ubuntu
-- [Docker Data Restore](docs/guides/docker-data-restore.md) - Restore Docker containers/images from backup
-- [Cloudflare DNS Update](docs/guides/cloudflare-dns-update.md) - Update DNS records with Tailscale IP via API
-- [GitHub PR Diff Trick](docs/guides/github-pr-diff-trick.md) - View PR diffs in different formats
-- [Node.js Path Mocking Dependency Injection](docs/guides/nodejs-path-mocking-dependency-injection.md) - Cross-platform testing with path.win32/posix
-- [Claude Memory Continuity Prompts](docs/guides/claude-memory-continuity-prompts.md) - Maintain conversation memory across Claude windows
-- [Git Smart Add Alias](docs/guides/git-smartadd-alias.md) - Remove trailing whitespace and stage files
-- [VirtIO Clipboard Sharing](docs/guides/virt-manager-clipboard-sharing.md) - Linux host ↔ Windows VM clipboard integration
+## ✨ Features
 
-### Troubleshooting
-- [Disable Rider WinForms Designer](docs/troubleshooting/disable-rider-winforms-designer.md) - Fix build-blocking designer processes
+- 🌐 **Bilingual** - Complete English and Chinese versions
+- 🔍 **Full-text search** - Find anything instantly 
+- 💬 **Comments** - GitHub Discussions integration
+- 📱 **Responsive** - Perfect on all devices
+- 🚀 **Auto-deploy** - Updates automatically on push
+
+## 📚 Content
+
+### Technical Guides
+- Development workflows and tools
+- System administration tips
+- Troubleshooting solutions
+- Cross-platform compatibility notes
+
+### Topics Covered
+- Docker automation and backup strategies
+- Git workflows and productivity tips  
+- VirtIO virtualization setup
+- Node.js testing patterns
+- DNS automation with Cloudflare
+- AI development workflows
+
+## 🛠 Tech Stack
+
+- **Framework**: [VitePress](https://vitepress.dev) - Static site generator
+- **Hosting**: [GitHub Pages](https://pages.github.com) with custom domain
+- **Comments**: [Giscus](https://giscus.app) via GitHub Discussions
+- **Deployment**: GitHub Actions - automated on every commit
+
+## 📝 Contributing
+
+This is a personal scribble collection, but corrections and suggestions are welcome via issues or discussions!
 
 ---
 
-*Knowledge base created: 2025-07-28*
+*"Good memory" compensated by good notes since 2024* 📝

@@ -26,6 +26,7 @@ export default defineConfig({
         nav: [
           { text: 'Guides', link: '/guides/' },
           { text: 'Troubleshooting', link: '/troubleshooting/' },
+          { text: 'Projects', link: '/projects/' },
           { text: 'Development', link: '/development/' },
           { 
             text: 'More', 
@@ -34,77 +35,24 @@ export default defineConfig({
               { text: 'RSS Feed', link: '/feed.rss' }
             ]
           }
-        ],        sidebar: {
-          "/guides/": [
+        ],
+        
+        sidebar: {
+          '/guides/': [
             {
-              "text": "Step-by-step Guides",
-              "items": [
-                {
-                  "text": "Claude Memory Continuity Prompts",
-                  "link": "/guides/claude-memory-continuity-prompts"
-                },
-                {
-                  "text": "CLI Development with Seq Logging",
-                  "link": "/guides/cli-development-with-seq"
-                },
-                {
-                  "text": "Docker Auto Installation (Ubuntu)",
-                  "link": "/guides/docker-auto-install"
-                },
-                {
-                  "text": "Docker Data Restore from Backup",
-                  "link": "/guides/docker-data-restore"
-                },
-                {
-                  "text": "Example New Article",
-                  "link": "/guides/example-new-article"
-                },
-                {
-                  "text": "Git Smart Add Alias",
-                  "link": "/guides/git-smartadd-alias"
-                },
-                {
-                  "text": "Improved Cloudflare DNS Update Script",
-                  "link": "/guides/cloudflare-dns-update"
-                },
-                {
-                  "text": "Mocking Node.js Path Separators: The Dependency Injection Solution",
-                  "link": "/guides/nodejs-path-mocking-dependency-injection"
-                },
-                {
-                  "text": "Quick Tip: Get GitHub PR Diffs Easily",
-                  "link": "/guides/github-pr-diff-trick"
-                },
-                {
-                  "text": "VirtIO Clipboard Sharing: Linux Host ↔ Windows Guest",
-                  "link": "/guides/virt-manager-clipboard-sharing"
-                }
+              text: 'Step-by-step Guides',
+              items: [
+                { text: 'CLI Development with Seq', link: '/guides/cli-development-with-seq' },
+                { text: 'Docker Auto Installation', link: '/guides/docker-auto-install' },
+                { text: 'Docker Data Restore', link: '/guides/docker-data-restore' },
+                { text: 'Cloudflare DNS Update', link: '/guides/cloudflare-dns-update' },
+                { text: 'GitHub PR Diff Trick', link: '/guides/github-pr-diff-trick' },
+                { text: 'Node.js Path Mocking DI', link: '/guides/nodejs-path-mocking-dependency-injection' },
+                { text: 'Claude Memory Continuity', link: '/guides/claude-memory-continuity-prompts' },
+                { text: 'Git Smart Add Alias', link: '/guides/git-smartadd-alias' },
+                { text: 'VirtIO Clipboard Sharing', link: '/guides/virt-manager-clipboard-sharing' }
               ]
             }
-          ],
-          "/troubleshooting/": [
-            {
-              "text": "Problem Solutions",
-              "items": [
-                {
-                  "text": "Fix Rider WinForms Designer Build Locks",
-                  "link": "/troubleshooting/disable-rider-winforms-designer"
-                }
-              ]
-            }
-          ],
-          "/development/": [
-            {
-              "text": "Development Tools",
-              "items": [
-                {
-                  "text": "Claude Commands",
-                  "link": "/development/claude/"
-                }
-              ]
-            }
-          ]
-        }
           ],
           '/troubleshooting/': [
             {
@@ -112,6 +60,12 @@ export default defineConfig({
               items: [
                 { text: 'Disable Rider WinForms Designer', link: '/troubleshooting/disable-rider-winforms-designer' }
               ]
+            }
+          ],
+          '/projects/': [
+            {
+              text: 'Side Projects',
+              items: []
             }
           ],
           '/development/': [
@@ -154,73 +108,24 @@ export default defineConfig({
               { text: 'RSS 订阅', link: '/feed.rss' }
             ]
           }
-        ],        sidebar: {
-          "/zh/guides/": [
+        ],
+        
+        sidebar: {
+          '/zh/guides/': [
             {
-              "text": "分步指南",
-              "items": [
-                {
-                  "text": "Claude 记忆连续性提示词",
-                  "link": "/zh/guides/claude-memory-continuity-prompts"
-                },
-                {
-                  "text": "CLI Development with Seq Logging",
-                  "link": "/zh/guides/cli-development-with-seq"
-                },
-                {
-                  "text": "Docker 自动安装（Ubuntu）",
-                  "link": "/zh/guides/docker-auto-install"
-                },
-                {
-                  "text": "Git 智能添加别名",
-                  "link": "/zh/guides/git-smartadd-alias"
-                },
-                {
-                  "text": "Node.js 路径分隔符模拟：依赖注入解决方案",
-                  "link": "/zh/guides/nodejs-path-mocking-dependency-injection"
-                },
-                {
-                  "text": "VirtIO 剪贴板共享：Linux 主机 ↔ Windows 虚拟机",
-                  "link": "/zh/guides/virt-manager-clipboard-sharing"
-                },
-                {
-                  "text": "从备份恢复 Docker 数据",
-                  "link": "/zh/guides/docker-data-restore"
-                },
-                {
-                  "text": "快速技巧：轻松获取 GitHub PR 差异",
-                  "link": "/zh/guides/github-pr-diff-trick"
-                },
-                {
-                  "text": "改进的 Cloudflare DNS 更新脚本",
-                  "link": "/zh/guides/cloudflare-dns-update"
-                }
+              text: '分步指南',
+              items: [
+                { text: 'Seq 日志的 CLI 开发', link: '/zh/guides/cli-development-with-seq' },
+                { text: 'VirtIO 剪贴板共享', link: '/zh/guides/virt-manager-clipboard-sharing' },
+                { text: 'GitHub PR 差异技巧', link: '/zh/guides/github-pr-diff-trick' },
+                { text: 'Git 智能添加别名', link: '/zh/guides/git-smartadd-alias' },
+                { text: 'Docker 自动安装', link: '/zh/guides/docker-auto-install' },
+                { text: 'Docker 数据恢复', link: '/zh/guides/docker-data-restore' },
+                { text: 'Node.js 路径模拟 DI', link: '/zh/guides/nodejs-path-mocking-dependency-injection' },
+                { text: 'Cloudflare DNS 更新', link: '/zh/guides/cloudflare-dns-update' },
+                { text: 'Claude 记忆连续性', link: '/zh/guides/claude-memory-continuity-prompts' }
               ]
             }
-          ],
-          "/zh/troubleshooting/": [
-            {
-              "text": "问题解决",
-              "items": [
-                {
-                  "text": "修复 Rider WinForms 设计器构建锁定",
-                  "link": "/zh/troubleshooting/disable-rider-winforms-designer"
-                }
-              ]
-            }
-          ],
-          "/zh/development/": [
-            {
-              "text": "开发工具",
-              "items": [
-                {
-                  "text": "Claude 命令",
-                  "link": "/zh/development/claude/"
-                }
-              ]
-            }
-          ]
-        }
           ],
           '/zh/troubleshooting/': [
             {

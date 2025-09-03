@@ -57,6 +57,10 @@ function generateSidebarConfigs() {
         text: 'Problem Solutions', 
         items: getMarkdownFiles('docs/troubleshooting')
       }],
+      '/projects/': [{
+        text: 'Side Projects',
+        items: getMarkdownFiles('docs/projects')
+      }],
       '/development/': [{
         text: 'Development Tools',
         items: getMarkdownFiles('docs/development').concat([

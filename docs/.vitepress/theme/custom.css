@@ -91,6 +91,27 @@
 }
 
 /**
+ * Edit Page Link - Make it subtle
+ * -------------------------------------------------------------------------- */
+
+.edit-link {
+  opacity: 0.15;
+  transition: opacity 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.edit-link:hover {
+  opacity: 1;
+}
+
+/* Hide on mobile completely */
+@media (max-width: 768px) {
+  .edit-link {
+    display: none;
+  }
+}
+
+/**
  * Mobile responsive
  * -------------------------------------------------------------------------- */
 

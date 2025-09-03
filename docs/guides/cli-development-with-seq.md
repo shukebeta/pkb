@@ -1,10 +1,10 @@
 # CLI Development with Seq Logging
 
-5分钟设置完整的命令行开发调试环境。
+5-minute setup for complete command-line development debugging environment.
 
-## 1. 启动Seq服务器
+## 1. Start Seq Server
 
-创建 `docker-compose.yml`:
+Create `docker-compose.yml`:
 ```yaml
 version: '3.8'
 services:
@@ -23,22 +23,22 @@ volumes:
   seq-data:
 ```
 
-启动服务：
+Start services:
 ```bash
 docker-compose up -d seq
-# 访问 http://localhost:5341
-# 用户名: admin, 密码: dev123
+# Access http://localhost:5341
+# Username: admin, Password: dev123
 ```
 
-## 2. C# 项目集成
+## 2. C# Project Integration
 
-### Serilog方式
+### Serilog Approach
 ```bash
 dotnet add package Serilog.AspNetCore
 dotnet add package Serilog.Sinks.Seq
 ```
 
-**方式1: 代码配置**
+**Method 1: Code Configuration**
 ```csharp
 using Serilog;
 
@@ -50,10 +50,10 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-// ... 其他配置
+// ... other configurations
 ```
 
-**方式2: appsettings.json配置**
+**Method 2: appsettings.json Configuration**
 ```json
 {
   "Serilog": {
@@ -85,16 +85,16 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-// ... 其他配置
+// ... other configurations
 ```
 
-### NLog方式
+### NLog Approach
 ```bash
 dotnet add package NLog.Web.AspNetCore
 dotnet add package NLog.Targets.Seq
 ```
 
-**方式1: 硬编码配置**
+**Method 1: Hardcoded Configuration**
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
@@ -109,7 +109,7 @@ dotnet add package NLog.Targets.Seq
 </nlog>
 ```
 
-**方式2: 从appsettings读取配置**
+**Method 2: Configuration from appsettings**
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
@@ -153,10 +153,10 @@ using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseNLog();
-// ... 其他配置
+// ... other configurations
 ```
 
-### 使用示例 (两种方式通用)
+### Usage Example (Common to Both Approaches)
 ```csharp
 public class OrderController : ControllerBase
 {
@@ -183,34 +183,34 @@ public class OrderController : ControllerBase
 }
 ```
 
-### NLog结构化日志
+### NLog Structured Logging
 ```csharp
-// 使用NLog的原生API获得更多控制
+// Use NLog native API for more control
 private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-// 结构化日志
+// Structured logging
 logger.Info("User {userId} performed {action} at {timestamp}", 
     user.Id, "login", DateTime.UtcNow);
 
-// 作用域上下文
+// Scope context
 using (NLog.ScopeContext.PushProperty("OrderId", orderId))
 {
     logger.Info("Processing started");
-    // 处理逻辑
+    // Processing logic
     logger.Info("Processing completed");
 }
 ```
 
-## 3. Flutter 项目集成
+## 3. Flutter Project Integration
 
-### 添加依赖
+### Add Dependencies
 ```yaml
 dependencies:
   http: ^1.1.0
   logging: ^1.2.0
 ```
 
-### 简单日志发送
+### Simple Log Sending
 ```dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -219,10 +219,10 @@ import 'package:logging/logging.dart';
 void main() {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
-    // 控制台输出
+    // Console output
     print('${record.level.name}: ${record.time}: ${record.message}');
     
-    // 发送到Seq
+    // Send to Seq
     http.post(
       Uri.parse('http://localhost:5341/api/events/raw'),
       headers: {'Content-Type': 'application/json'},
@@ -238,43 +238,43 @@ void main() {
 }
 ```
 
-## 4. CLI 调试技巧
+## 4. CLI Debugging Tips
 
-### 替代断点调试
+### Alternative to Breakpoint Debugging
 ```csharp
-// 记录变量状态
+// Log variable states
 _logger.LogDebug("Processing user {@User} with settings {@Settings}", user, settings);
 
-// 性能监控
+// Performance monitoring
 var sw = Stopwatch.StartNew();
 await DoWork();
 _logger.LogInformation("Work completed in {ElapsedMs}ms", sw.ElapsedMilliseconds);
 
-// 条件日志
+// Conditional logging
 if (order.Total > 1000)
     _logger.LogWarning("High value order {OrderId}: {Total}", order.Id, order.Total);
 ```
 
-### Seq 查询技巧
-- 搜索: `UserId = 123`
-- 时间范围: 最近1小时
-- 级别过滤: Warning以上
-- 属性查看: 展开 `@Properties`
+### Seq Query Tips
+- Search: `UserId = 123`
+- Time range: Last 1 hour
+- Level filter: Warning and above
+- Property view: Expand `@Properties`
 
-## 5. 开发命令
+## 5. Development Commands
 
 ```bash
-# 热重载开发
+# Hot reload development
 dotnet watch run
 
-# Flutter热重载
+# Flutter hot reload
 flutter run
 
-# 查看Seq日志
+# View Seq logs
 open http://localhost:5341
 
-# 停止服务
+# Stop services
 docker-compose down
 ```
 
-就这些。无需GUI调试器，Seq提供了更丰富的运行时洞察。
+That's it. No need for GUI debugger - Seq provides richer runtime insights.

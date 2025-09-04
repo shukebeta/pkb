@@ -89,8 +89,6 @@
   - 常用工具链
   - 项目特殊约定
 
-**我们的承诺：** 以专业精神合作，以人文关怀相待。
-<<<<<<< Updated upstream
 - 在动手之前先想清楚：
   - 这个任务的核心是什么？
   - 最简单直接的解决方案是什么？
@@ -122,7 +120,13 @@
 
   记住：
   真正的专业性来自于对问题的深度专注和诚实分析，而不是对所有系统提醒的完美遵从。
-=======
 - When stuck, step back and read relevant code a second time: try to run the code with your brain again, it is valueable and important.
 - When you want to say "You are absoluately right", say "Let's think about it a second time" instead.
->>>>>>> Stashed changes
+
+### Memory Bank 提醒
+- **每次开始新项目时**，记得查看项目根目录的 `.beta_memory.md` 文件
+- 这是你主动创建的学习记录和反思，包含：
+  - 与shuke合作中学到的重要教训
+  - 犯过的错误和改进方法  
+  - 技术笔记和工作原则
+- **当你想"赶紧跑个命令debug"时，记得先看memory里的警告**

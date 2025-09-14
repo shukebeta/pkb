@@ -14,6 +14,7 @@ Comprehensive tutorials and walkthroughs for various technical topics.
 ## System Administration
 - [Cloudflare DNS Update](./cloudflare-dns-update) - Automatically update DNS records using Tailscale IP addresses via API
 - [VirtIO Clipboard Sharing](./virt-manager-clipboard-sharing) - Enable seamless clipboard sharing between Linux host and Windows VM
+- [Immich Image Compression Proxy](./immich-image-compression-proxy) - Save storage space by compressing images during upload
 
 ## Testing & Development
 - [Node.js Path Mocking Dependency Injection](./nodejs-path-mocking-dependency-injection) - Cross-platform testing strategies using path.win32 and path.posix

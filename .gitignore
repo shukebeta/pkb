@@ -3,7 +3,12 @@ handover
 # VitePress build output
 docs/.vitepress/dist
 docs/.vitepress/cache
+
+# Auto-generated files (do not commit)
 docs/.vitepress/generated-sidebars.js
+docs/.vitepress/generated-sidebars.cjs  
+docs/.vitepress/generated-home-data.cjs
+docs/public/generated-home-data.json
 
 # Node.js
 node_modules/

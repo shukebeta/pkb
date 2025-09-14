@@ -37,17 +37,11 @@ features:
     details: Content available in both English and Chinese for broader accessibility
 ---
 
-## 🚀 Featured Content
+<script setup>
+import DynamicHomePage from './.vitepress/components/DynamicHomePage.vue'
+</script>
 
-### Recent Additions
-- [VirtIO Clipboard Sharing](/guides/virt-manager-clipboard-sharing) - Seamless clipboard between Linux and Windows VM
-- [CLI Development with Seq](/guides/cli-development-with-seq) - Professional logging for command-line applications
-- [Docker Data Restore](/guides/docker-data-restore) - Backup and restore Docker environments
-
-### Popular Solutions
-- [Git Smart Add Alias](/guides/git-smartadd-alias) - Automatically clean whitespace when staging files
-- [GitHub PR Diff Tricks](/guides/github-pr-diff-trick) - Advanced PR viewing techniques
-- [Node.js Path Mocking](/guides/nodejs-path-mocking-dependency-injection) - Cross-platform testing strategies
+<DynamicHomePage />
 
 ---
 

@@ -4,7 +4,14 @@ import { createRequire } from 'module'
 const requireCJS = createRequire(import.meta.url)
 const GENERATED_SIDEBARS = (() => {
   try {
-    return requireCJS('./generated-sidebars.js').default
+    return requireCJS('./generated-sidebars.cjs')
+  } catch (e) {
+    return null
+  }
+})()
+const GENERATED_HOME_DATA = (() => {
+  try {
+    return requireCJS('./generated-home-data.cjs')
   } catch (e) {
     return null
   }

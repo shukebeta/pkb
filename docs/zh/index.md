@@ -37,17 +37,11 @@ features:
     details: 内容提供中英文版本，满足更广泛的用户需求
 ---
 
-## 🚀 精选内容
+<script setup>
+import DynamicHomePage from '../.vitepress/components/DynamicHomePage.vue'
+</script>
 
-### 最新文章
-- [VirtIO 剪贴板共享](/zh/guides/virt-manager-clipboard-sharing) - Linux 主机与 Windows 虚拟机间的无缝剪贴板
-- [Seq CLI 开发](/zh/guides/cli-development-with-seq) - 命令行应用的专业日志记录
-- [Docker 数据恢复](/zh/guides/docker-data-restore) - Docker 环境的备份与恢复
-
-### 热门解决方案
-- [Git 智能添加别名](/zh/guides/git-smartadd-alias) - 暂存文件时自动清理空白字符
-- [GitHub PR 差异技巧](/zh/guides/github-pr-diff-trick) - 高级 PR 查看技术
-- [Node.js 路径模拟](/zh/guides/nodejs-path-mocking-dependency-injection) - 跨平台测试策略
+<DynamicHomePage />
 
 ---
 

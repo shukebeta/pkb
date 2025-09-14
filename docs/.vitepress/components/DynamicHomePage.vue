@@ -1,10 +1,10 @@
 <template>
   <div class="dynamic-home">
-    <section v-if="homeData && homeData.recentArticles.length > 0" class="recent-articles">
+    <section v-if="currentData && currentData.recentArticles.length > 0" class="recent-articles">
       <h2>🚀 Recent Articles</h2>
       <div class="article-grid">
         <article 
-          v-for="article in homeData.recentArticles.slice(0, 6)" 
+          v-for="article in currentData.recentArticles.slice(0, 6)" 
           :key="article.link"
           class="article-card"
         >
@@ -18,26 +18,37 @@
       </div>
     </section>
 
-    <section v-if="homeData && homeData.totalCount > 6" class="all-articles-link">
+    <section v-if="currentData && currentData.totalCount > 6" class="all-articles-link">
       <div class="stats">
-        <p>📚 Total: <strong>{{ homeData.totalCount }}</strong> articles</p>
-        <p>🔄 Last updated: {{ formatDate(homeData.lastUpdated) }}</p>
+        <p>📚 Total: <strong>{{ currentData.totalCount }}</strong> articles</p>
+        <p>🔄 Last updated: {{ formatDate(currentData.lastUpdated) }}</p>
       </div>
     </section>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useData } from 'vitepress'
 
 const homeData = ref(null)
+const { lang } = useData()
+
+const currentData = computed(() => {
+  if (!homeData.value) return null
+  
+  // Determine if we're on Chinese site
+  const isChineseSite = lang.value === 'zh-CN' || window.location.pathname.startsWith('/zh/')
+  
+  return isChineseSite ? homeData.value.chinese : homeData.value.english
+})
 
 onMounted(async () => {
   try {
-    // In VitePress, we can't directly import CommonJS modules in client code
-    // So we'll pass the data through a global variable or fetch it
-    // For now, let's create a simple data loader
-    const response = await fetch('/generated-home-data.json')
+    // Support subpath deployment by using VitePress base URL
+    const base = import.meta.env.BASE_URL || '/'
+    const dataUrl = new URL('generated-home-data.json', base).href
+    const response = await fetch(dataUrl)
     if (response.ok) {
       homeData.value = await response.json()
     }

@@ -18,9 +18,13 @@ function getFileStats(filePath) {
   }
 }
 
-function parseFrontMatter(content) {
+
+function getPageInfo(filePath) {
   try {
-    const { data } = matter(content)
+    const rawContent = readFileSync(filePath, 'utf-8')
+    const { data, content } = matter(rawContent)
+    
+    // Get metadata from frontmatter
     let title = data.title || null
     let order = data.order || 99
     let sidebarHidden = data.sidebar === false
@@ -32,27 +36,18 @@ function parseFrontMatter(content) {
       else order = 99
     }
     
-    return { title, order, sidebarHidden }
-  } catch (error) {
-    console.warn(`Warning: Failed to parse frontmatter - ${error.message}`)
-    return { title: null, order: 99, sidebarHidden: false }
-  }
-}
-
-function getPageInfo(filePath) {
-  try {
-    const content = readFileSync(filePath, 'utf-8')
-    const { title: fmTitle, order, sidebarHidden } = parseFrontMatter(content)
-    let title = fmTitle
-    
+    // If no title in frontmatter, extract from content's first H1
     if (!title) {
-      const h1 = content.match(/^\s*#\s+(.*)$/m)
-      title = h1 ? h1[1].trim() : basename(filePath).replace(/\.md$/, '')
+      const h1Match = content.match(/^\s*#\s+(.*)$/m)
+      title = h1Match ? h1Match[1].trim() : basename(filePath).replace(/\.md$/, '')
     }
     
-    // Get description from first paragraph after title
-    const descMatch = content.match(/^#\s+.*?\n\n([^#\n]+)/m)
-    const description = descMatch ? descMatch[1].trim().substring(0, 120) + '...' : ''
+    // Get description from first paragraph in content (after removing H1)
+    const contentWithoutH1 = content.replace(/^\s*#\s+.*$/m, '').trim()
+    const firstParagraph = contentWithoutH1.split('\n\n')[0]
+    const description = firstParagraph 
+      ? firstParagraph.trim().substring(0, 120).replace(/\n/g, ' ') + '...'
+      : ''
     
     const stats = getFileStats(filePath)
     
@@ -69,16 +64,11 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-function slugify(str) {
-  return str
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')           // Replace spaces with -
-    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-    .replace(/^-+/, '')             // Trim - from start of text
-    .replace(/-+$/, '')             // Trim - from end of text
+function createSafeUrl(filename) {
+  // Just remove the .md extension and use original filename
+  // VitePress handles URL encoding automatically
+  // For Chinese filenames, this preserves the original characters
+  return filename.replace(/\.md$/, '')
 }
 
 function buildDirectory(dirPath, baseUrl = '/') {
@@ -107,8 +97,8 @@ function buildDirectory(dirPath, baseUrl = '/') {
     } else {
       const { title, order, sidebarHidden, stats } = getPageInfo(fullPath)
       if (!sidebarHidden) {
-        const name = entry.name.slice(0, -3) // Remove .md more efficiently  
-        const link = baseUrl + slugify(name)
+        const name = createSafeUrl(entry.name)
+        const link = baseUrl + name
         childItems.push({ text: title, link, order, mtime: stats?.mtime })
       }
     }
@@ -215,8 +205,8 @@ function collectAllArticles() {
         const { title, sidebarHidden, description, stats } = getPageInfo(fullPath)
         
         if (!sidebarHidden && stats) {
-          const name = entry.name.slice(0, -3)
-          const link = baseUrl + slugify(name)
+          const name = createSafeUrl(entry.name)
+          const link = baseUrl + name
           
           allArticles.push({
             title,
@@ -252,17 +242,27 @@ function collectAllArticles() {
 function generateHomeData() {
   const allArticles = collectAllArticles()
   
-  // Sort by modification time (newest first)
-  allArticles.sort((a, b) => new Date(b.mtime) - new Date(a.mtime))
+  // Separate articles by language
+  const englishArticles = allArticles.filter(article => article.language === 'en')
+  const chineseArticles = allArticles.filter(article => article.language === 'zh')
   
-  const recentArticles = allArticles.slice(0, 10)
-  const featuredArticles = allArticles.slice(0, 6)
+  // Sort by modification time (newest first)
+  englishArticles.sort((a, b) => new Date(b.mtime) - new Date(a.mtime))
+  chineseArticles.sort((a, b) => new Date(b.mtime) - new Date(a.mtime))
   
   return {
-    recentArticles,
-    featuredArticles,
-    totalCount: allArticles.length,
-    lastUpdated: new Date().toISOString()
+    english: {
+      recentArticles: englishArticles.slice(0, 10),
+      featuredArticles: englishArticles.slice(0, 6),
+      totalCount: englishArticles.length,
+      lastUpdated: new Date().toISOString()
+    },
+    chinese: {
+      recentArticles: chineseArticles.slice(0, 10),
+      featuredArticles: chineseArticles.slice(0, 6), 
+      totalCount: chineseArticles.length,
+      lastUpdated: new Date().toISOString()
+    }
   }
 }
 
@@ -301,7 +301,7 @@ try {
   const englishSections = Object.keys(sidebars.english).length
   const chineseSections = Object.keys(sidebars.chinese).length
   console.log(`📝 Generated ${englishSections} English sections and ${chineseSections} Chinese sections`)
-  console.log(`📰 Found ${homeData.totalCount} articles, ${homeData.recentArticles.length} recent`)
+  console.log(`📰 Found ${homeData.english.totalCount} English articles, ${homeData.chinese.totalCount} Chinese articles`)
   
   writeGeneratedFile(sidebars, homeData)
   console.log('💡 Run `npm run docs:dev` to preview changes locally')

@@ -3,8 +3,8 @@
     <section v-if="currentData && currentData.recentArticles.length > 0" class="recent-articles">
       <h2>🚀 Recent Articles</h2>
       <div class="article-grid">
-        <article 
-          v-for="article in currentData.recentArticles.slice(0, 6)" 
+        <article
+          v-for="article in currentData.recentArticles.slice(0, 6)"
           :key="article.link"
           class="article-card"
         >
@@ -36,11 +36,11 @@ const { lang } = useData()
 
 const currentData = computed(() => {
   if (!homeData.value) return null
-  
+
   // Determine if we're on Chinese site (with SSR protection)
-  const isChineseSite = lang.value === 'zh-CN' || 
+  const isChineseSite = lang.value === 'zh-CN' ||
     (typeof window !== 'undefined' && window.location.pathname.startsWith('/zh/'))
-  
+
   return isChineseSite ? homeData.value.chinese : homeData.value.english
 })
 
@@ -48,17 +48,13 @@ onMounted(async () => {
   try {
     // Support subpath deployment by using VitePress base URL
     const base = import.meta.env.BASE_URL || '/'
-    const dataUrl = base.endsWith('/') 
+    const dataUrl = base.endsWith('/')
       ? base + 'generated-home-data.json'
       : base + '/generated-home-data.json'
-    
-    console.log('Fetching home data from:', dataUrl)
+
     const response = await fetch(dataUrl)
     if (response.ok) {
       homeData.value = await response.json()
-      console.log('Home data loaded:', homeData.value)
-    } else {
-      console.error('Failed to fetch home data:', response.status, response.statusText)
     }
   } catch (error) {
     console.warn('Could not load home data:', error)
@@ -68,7 +64,7 @@ onMounted(async () => {
 function getCategoryIcon(category) {
   const icons = {
     guides: '📖',
-    troubleshooting: '🔧', 
+    troubleshooting: '🔧',
     development: '💻',
     projects: '🚀'
   }
@@ -76,11 +72,17 @@ function getCategoryIcon(category) {
 }
 
 function formatDate(dateStr) {
+  if (!dateStr) return ''
+
   const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  if (isNaN(date.getTime())) return ''
+
+  // Use locale-aware formatting based on current language
+  const locale = lang.value === 'zh-CN' ? 'zh-CN' : 'en-US'
+  return date.toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
   })
 }
 </script>

@@ -3,6 +3,7 @@ handover
 # VitePress build output
 docs/.vitepress/dist
 docs/.vitepress/cache
+docs/.vitepress/generated-sidebars.js
 
 # Node.js
 node_modules/

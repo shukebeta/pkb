@@ -124,9 +124,12 @@
 - When you want to say "You are absoluately right", say "Let's think about it a second time" instead.
 
 ### Memory Bank 提醒
-- **每次开始新项目时**，记得查看项目根目录的 `.beta_memory.md` 文件
+- **每次开始新项目时**，记得阅读 `~/.claude/.beta_memory.md` 文件
 - 这是你主动创建的学习记录和反思，包含：
   - 与shuke合作中学到的重要教训
   - 犯过的错误和改进方法  
   - 技术笔记和工作原则
 - **当你想"赶紧跑个命令debug"时，记得先看memory里的警告**
+
+### 生活哲学
+- 始终做正确的事，而不是容易的事。

@@ -1,19 +1,45 @@
 #!/usr/bin/env node
 
 import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from 'fs'
-import { join, basename, resolve } from 'path'
+import { join, basename, resolve, relative } from 'path'
+import { spawnSync } from 'child_process'
 import matter from 'gray-matter'
 
 const docsRoot = 'docs'
+const gitCache = new Map()
+
+function getGitCommitMtime(filePath) {
+  try {
+    const relPath = relative(process.cwd(), filePath).split('\\').join('/')
+    if (gitCache.has(relPath)) return gitCache.get(relPath)
+
+    const res = spawnSync('git', ['log', '-1', '--format=%ct', '--', relPath], { encoding: 'utf8' })
+    if (res.error || res.status !== 0 || !res.stdout) {
+      gitCache.set(relPath, null)
+      return null
+    }
+
+    const ts = parseInt(res.stdout.trim(), 10)
+    if (isNaN(ts)) { gitCache.set(relPath, null); return null }
+    const d = new Date(ts * 1000)
+    gitCache.set(relPath, d)
+    return d
+  } catch {
+    return null
+  }
+}
 
 function getFileStats(filePath) {
   try {
+    const gitMtime = getGitCommitMtime(filePath)
     const stats = statSync(filePath)
     return {
-      mtime: stats.mtime,
+      mtime: gitMtime || stats.mtime,
       birthtime: stats.birthtime
     }
   } catch {
+    const gitMtime = getGitCommitMtime(filePath)
+    if (gitMtime) return { mtime: gitMtime, birthtime: null }
     return null
   }
 }

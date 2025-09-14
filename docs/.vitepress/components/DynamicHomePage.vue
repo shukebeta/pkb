@@ -37,8 +37,9 @@ const { lang } = useData()
 const currentData = computed(() => {
   if (!homeData.value) return null
   
-  // Determine if we're on Chinese site
-  const isChineseSite = lang.value === 'zh-CN' || window.location.pathname.startsWith('/zh/')
+  // Determine if we're on Chinese site (with SSR protection)
+  const isChineseSite = lang.value === 'zh-CN' || 
+    (typeof window !== 'undefined' && window.location.pathname.startsWith('/zh/'))
   
   return isChineseSite ? homeData.value.chinese : homeData.value.english
 })
@@ -47,10 +48,17 @@ onMounted(async () => {
   try {
     // Support subpath deployment by using VitePress base URL
     const base = import.meta.env.BASE_URL || '/'
-    const dataUrl = new URL('generated-home-data.json', base).href
+    const dataUrl = base.endsWith('/') 
+      ? base + 'generated-home-data.json'
+      : base + '/generated-home-data.json'
+    
+    console.log('Fetching home data from:', dataUrl)
     const response = await fetch(dataUrl)
     if (response.ok) {
       homeData.value = await response.json()
+      console.log('Home data loaded:', homeData.value)
+    } else {
+      console.error('Failed to fetch home data:', response.status, response.statusText)
     }
   } catch (error) {
     console.warn('Could not load home data:', error)

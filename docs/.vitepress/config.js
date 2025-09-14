@@ -9,13 +9,6 @@ const GENERATED_SIDEBARS = (() => {
     return null
   }
 })()
-const GENERATED_HOME_DATA = (() => {
-  try {
-    return requireCJS('./generated-home-data.cjs')
-  } catch (e) {
-    return null
-  }
-})()
 
 export default defineConfig({
   title: "shukebeta's scribbles",

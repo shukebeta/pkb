@@ -65,10 +65,9 @@ function capitalize(str) {
 }
 
 function createSafeUrl(filename) {
-  // Just remove the .md extension and use original filename
-  // VitePress handles URL encoding automatically
-  // For Chinese filenames, this preserves the original characters
-  return filename.replace(/\.md$/, '')
+  // Remove .md extension and encode for URL safety
+  // encodeURI preserves path semantics while handling special chars
+  return encodeURI(filename.replace(/\.md$/, ''))
 }
 
 function buildDirectory(dirPath, baseUrl = '/') {
@@ -250,18 +249,27 @@ function generateHomeData() {
   englishArticles.sort((a, b) => new Date(b.mtime) - new Date(a.mtime))
   chineseArticles.sort((a, b) => new Date(b.mtime) - new Date(a.mtime))
   
+  // Calculate last updated time based on actual article modification times
+  function getLastUpdated(articles) {
+    const validArticles = articles.filter(a => a.mtime)
+    if (validArticles.length === 0) return new Date().toISOString()
+    
+    const lastMs = Math.max(...validArticles.map(a => new Date(a.mtime).getTime()))
+    return new Date(lastMs).toISOString()
+  }
+
   return {
     english: {
       recentArticles: englishArticles.slice(0, 10),
       featuredArticles: englishArticles.slice(0, 6),
       totalCount: englishArticles.length,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: getLastUpdated(englishArticles)
     },
     chinese: {
       recentArticles: chineseArticles.slice(0, 10),
       featuredArticles: chineseArticles.slice(0, 6), 
       totalCount: chineseArticles.length,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: getLastUpdated(chineseArticles)
     }
   }
 }

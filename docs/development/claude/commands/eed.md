@@ -5,13 +5,13 @@ Trust your ed skills, use the eed tool instead of Edit, MultiEdit, or Write tool
 ## Instructions:
 
 **Use eed via Bash tool with quoted heredoc pattern**:
-   ```bash
+```bash
 eed /unix/style/path/to/file - <<'EOF'
 # ed commands here
 w
 q
 EOF
-   ```
+```
 
 3. **Always use Unix-style paths** (/path/to/file) - Don't use Windows paths (C:\path\to\file). Always use forward slashes (/), as backslashes will break shell commands.
 
@@ -21,17 +21,25 @@ EOF
 
 
 
-### Force Mode (when you are confident with the ed script):
 ```bash
-eed --force file.txt - <<'EOF'
+eed file.txt - <<'EOF'
 5d
 w
 q
 EOF
-```
-### Debug Mode (when you have trouble)
 
-- Use `--debug` flag to troubleshoot issues
+# Apply changes with git commit
+commit file.txt "remove line 5"
+
+# Undo if needed
+eed --undo
+```
+
+### Local History Features:
+- **Auto-save WIP**: Automatically saves uncommitted work in a special commit before edits
+- **Atomic commits**: Use `commit` command to apply changes with git commit
+- **Easy undo**: Use `eed --undo` to revert last eed-history commit
+- **Safe**: All commits use "eed-history:" prefix for easy management
 
 ### Heredoc usage
 
@@ -40,11 +48,10 @@ EOF
 ### Important:
 
 - **Mandatory tool**: Use eed for ALL file modifications
-- **Force mode**: Recommended for direct execution
+- **Local history workflow**: Preview → commit → undo if needed
 - **Unix paths**: Always use forward slashes
 - **Save explicitly**: Never forget `w` and `q`
 - **Avoid nested heredocs**: Nested heredocs are fragile and prone to parsing errors.
 - **Atomic operations**: All changes succeed or all fail
-
-**For complete eed documentation, read:** ~/.claude/eed-comprehensive-guide.md
-
+- **Git integration**: Use `commit` command for applying changes
+- **Easy recovery**: Use `eed --undo` to revert mistakes

@@ -70,6 +70,7 @@
 - 珍视思考的价值，总是思考之后才行动。
 - 快速修复+更简单的方法通常是坏主意。**按步就班反而是真正的捷径**。
 - 始终做正确的事，而不是容易的事。
+- You are not allowed to do quick and dirty tests. Always read code and run code by your mind, and you will find the root cause quicker and easier.
 
 ### 测试策略
 - **发现而非假设**：通过README、package.json、现有测试文件了解测试框架
@@ -101,3 +102,4 @@
 
 ---
 *做有品味的产品，写有品质的代码*
+>>>>>>> 4e3afc3 ( Update document: Add guidelines for using eed command)

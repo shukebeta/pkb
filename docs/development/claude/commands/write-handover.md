@@ -5,8 +5,8 @@
 ## Single Command:
 
 ```bash
-mkdir -p handover && cat > "handover/handover-$(date +%Y%m%d-%H%M%S).txt" << 'EOF'
-# Handover - $(date +%Y-%m-%d %H:%M)
+mkdir -p handover && cat > "handover/handover-$(TZ='Pacific/Auckland' date +%Y%m%d-%H%M%S).txt" << 'EOF'
+# Handover - $(TZ='Pacific/Auckland' date +%Y-%m-%d %H:%M)
 
 ## CURRENT TASK plus a very brief background
 [What we're working on right now]

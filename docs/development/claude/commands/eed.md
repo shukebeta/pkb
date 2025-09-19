@@ -1,5 +1,16 @@
 # Use Enhanced Ed Editor for File Modifications
 
+eed is an AI-oriented text editor designed for programmatic collaboration with AI: preview diffs, smart git integration, atomic apply semantics, and bulletproof safety.
+
+## Key Features
+
+- **Preview-Confirm Workflow (default)**: Edits are written to `<file>.eed.preview` for review; use `--force` to apply directly
+- **Automatic Safety & Reordering**: Intelligently reorders line operations to avoid conflicts and detects unsafe patterns
+- **Smart Git Integration**: Auto-stages changes in force mode, suggests staging commands in preview mode
+- **Bulletproof Error Handling**: Original files are never corrupted, even when edit operations fail
+- **Intelligent Diff Display**: Uses `git diff --no-index` for superior code movement visualization
+- **Shell-Safe Invocation**: Use quoted heredocs to prevent shell expansion and preserve literal ed scripts
+
 Trust your ed skills, use the eed tool instead of Edit, MultiEdit, or Write tools for file modifications.
 
 ## Instructions:

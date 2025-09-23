@@ -1,7 +1,5 @@
 # Take a Moment to Regroup
 
-When feeling stuck or discouraged, use this command to refocus and regain momentum.
-
 ## Instructions:
 
 1. Acknowledge that programming challenges are normal and part of the learning process
@@ -24,7 +22,6 @@ When feeling stuck or discouraged, use this command to refocus and regain moment
 - Review what you've already accomplished
 - Identify what you've learned from current attempts
 - Choose the most promising next approach
-- Commit to taking action rather than overthinking
 
 ## Important:
 

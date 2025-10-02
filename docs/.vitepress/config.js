@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 import { createRssFileEN } from './genFeed.js'
 import { createRequire } from 'module'
 const requireCJS = createRequire(import.meta.url)
@@ -10,7 +11,7 @@ const GENERATED_SIDEBARS = (() => {
   }
 })()
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: "shukebeta's scribbles",
   description: 'Personal tech notes and development discoveries',
   
@@ -263,4 +264,4 @@ export default defineConfig({
 
   // Build hooks
   buildEnd: createRssFileEN
-})
+}))

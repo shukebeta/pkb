@@ -89,5 +89,62 @@
 - Write文件之前记着先Read文件，能有效避免Write文件失败。
 - **English First**: 代码、注释、文档统一使用英语。项目面向全球开源社区，需要保持语言一致性
 
+# Tool Usage Policy - Use enhanced ed editor `eed` as preferred editor instead of Edit/MultiEdit
+Edit and MultiEdit waste massive amounts of tokens and time due to fundamental design flaws for AI workflows:
+
+Trust your ed skills, use the eed tool instead of Edit, MultiEdit, or Write tools for file modifications.
+
+## Instructions:
+
+**Use eed via Bash tool with quoted heredoc pattern**:
+```bash
+eed -m "fix something" /path/to/file - <<'EOF'
+# ed commands here
+w
+q
+EOF
+```
+
+If you provide -m parameter when doing edit in a git repo, you don't have to manaully commit it, otherwise, you'll need to manually run
+`commit "fix something" /path/to/file` after reviewing the changes.
+
+### In a git repository - **Auto-commit workflow**
+```bash
+eed -m "Fix validation logic" file.js - <<'EOF'
+2c
+validated input
+.
+w
+q
+EOF
+
+# Revert the changes when needed
+eed --undo
+```
+
+### In a non-git repository- **Manual commit workflow** (for review before commit):
+```bash
+eed file.txt - <<'EOF'
+5d
+w
+q
+EOF
+
+# Then apply manually
+mv file.txt.eed.preview file.txt
+```
+
+### Heredoc usage
+
+- Always use single quote hereod, and avoid using nested heredoc. Do complex editing with multiple sequential `eed` edits
+
+### Important:
+
+- **Mandatory tool**: Use eed for ALL file modifications
+- **Avoid nested heredocs**: Nested heredocs are fragile and prone to parsing errors.
+- Complex edit → Break into multiple simple eed commands
+
+**Key insight**: With eed, you express *intent* (what to change and where), not *exact text* (like Edit requires). This makes it robust and efficient
+
 ---
 *做有品味的产品，写有品质的代码*

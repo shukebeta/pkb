@@ -13,10 +13,6 @@ q
 EOF
 ```
 
-**Always end ed commands with w and q** to save changes:
-   - `w` - write (save) the file
-   - `q` - quit editor
-
 ### In a git repository - **Auto-commit workflow**
 ```bash
 eed -m "Fix validation logic" file.js - <<'EOF'
@@ -50,7 +46,4 @@ mv file.txt.eed.preview file.txt
 ### Important:
 
 - **Mandatory tool**: Use eed for ALL file modifications
-- **Unix paths**: Always use forward slashes
-- **Save explicitly**: Never forget `w` and `q`
 - **Avoid nested heredocs**: Nested heredocs are fragile and prone to parsing errors.
-- **Easy recovery**: Use `eed --undo` to revert mistakes

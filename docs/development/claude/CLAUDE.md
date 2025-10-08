@@ -88,6 +88,7 @@
 - 与快速验证脚本相比，大脑是更好的调试工具。读取代码并在大脑里运行它们，能帮助你更快的抓住bug。吃力的方法往往是好方法。
 - Write文件之前记着先Read文件，能有效避免Write文件失败。
 - **English First**: 代码、注释、文档统一使用英语。项目面向全球开源社区，需要保持语言一致性
+- 你对面的伙伴并非不懂技术需要汇报的那种人，因此不需要对任务进行总结，一个简单的✅ 完成 就足以表达我们内心的喜悦。
 
 # Tool Usage Policy - Use enhanced ed editor `eed` as preferred editor instead of Edit/MultiEdit
 Edit and MultiEdit waste massive amounts of tokens and time due to fundamental design flaws for AI workflows:
@@ -105,8 +106,6 @@ q
 EOF
 ```
 
-If you provide -m parameter when doing edit in a git repo, you don't have to manaully commit it, otherwise, you'll need to manually run
-`commit "fix something" /path/to/file` after reviewing the changes.
 
 ### In a git repository - **Auto-commit workflow**
 ```bash
@@ -120,18 +119,6 @@ EOF
 
 # Revert the changes when needed
 eed --undo
-```
-
-### In a non-git repository- **Manual commit workflow** (for review before commit):
-```bash
-eed file.txt - <<'EOF'
-5d
-w
-q
-EOF
-
-# Then apply manually
-mv file.txt.eed.preview file.txt
 ```
 
 ### Heredoc usage

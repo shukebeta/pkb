@@ -128,6 +128,8 @@ eed --undo
 ### Important:
 
 - **Mandatory tool**: Use eed for ALL file modifications
+- **Auto line-number reordering**: Delete multiple lines in any order (1d, 3d, 5d) - eed automatically reorders them (5d, 3d, 1d) to prevent line number drift
+- **Auto w/q**: Even if you forget to write `w` and `q`, eed handles it automatically
 - **Avoid nested heredocs**: Nested heredocs are fragile and prone to parsing errors.
 - Complex edit → Break into multiple simple eed commands
 
